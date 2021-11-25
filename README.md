@@ -15,16 +15,16 @@ Basic experience in development with C# and ASP.NET (Core). Experience with REST
 ### **Tech prerequisite**
 
 - IDE: [VSCode](https://code.visualstudio.com/) / Rider / Visual Studio
-- SDK: [.NET 6 RC2 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- SDK: [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 - A GraphQL Client like [Banana Cake Pop](https://chillicream.com/docs/bananacakepop) or [Altair GraphQL Client](https://altair.sirmuel.design/)
 
 ## 🏋️‍♂️ Challenges
 
 The challenges can be solved individually or in teams. We will provide you separate collabaration environment.
 
-[01: Create your GraphQL Server Project](challenges/01-create-graphql-server)
+[01: Create your GraphQL Server Project](challenges/01-create-graphql-server/README.md)
 
-[02: GraphQL Query Execution & DataLoader](challenges)
+[02: GraphQL Query Execution & DataLoader](challenges/02-understanding-dataLoader/README.md)
 
 [03: Schema design approaches](challenges)
 
