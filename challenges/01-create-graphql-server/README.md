@@ -40,6 +40,10 @@
    }
    ```
 
+   > Your IDE will give you the following hint: **_Non-nullable property 'Bio' must contain a non-null value when exiting constructor. Consider declaring the property as nullable._**
+   >
+   > We will fix this hint at the end of this challenge. You can ignore it for now.
+
 1. Add a reference to the NuGet package package `Microsoft.EntityFrameworkCore.Sqlite` version `6.0.0`.
    1. `dotnet add GraphQL package Microsoft.EntityFrameworkCore.Sqlite --version 6.0.0`
 1. Next we'll create a new Entity Framework DbContext. Create a new `ApplicationDbContext` class in the `Data` folder using the following code:
