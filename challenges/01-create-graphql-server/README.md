@@ -154,13 +154,10 @@ Commands Explained
 
    > The above code registers a GraphQL schema with our dependency injection and with that registers our `Query` type.
 
-1. Next we need to configure our GraphQL middleware so that the server knows how to execute GraphQL requests. For this replace `app.UseEndpoints...` with the following code in the `Programm.cs`
+1. Next we need to configure our GraphQL middleware so that the server knows how to execute GraphQL requests. For this add `app.MapGraphQL();` in `Programm.cs`
 
    ```csharp
-   app.UseEndpoints(endpoints =>
-   {
-       endpoints.MapGraphQL();
-   });
+   app.MapGraphQL();
    ```
 
    > Your `Programm.cs` should now look like the following:
@@ -180,10 +177,7 @@ Commands Explained
     var app = builder.Build();
 
     app.UseRouting();
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapGraphQL();
-    });
+    app.MapGraphQL();
 
     app.Run();
    ```
@@ -321,33 +315,6 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
 ## Configure Nullability
 
 The GraphQL type system distinguishes between nullable and non-nullable types. This helps the consumer of the API by providing guarantees when a field value can be trusted to never be null or when an input is not allowed to be null. The ability to rely on such type information simplifies the code of the null since we do not have to write a ton of null checks for things that will never be null.
-
-1. Open the project file of your GraphQL server project `ConferencePlanner.GraphQL.csproj` and add the following property:
-
-   ```xml
-   <Nullable>enable</Nullable>
-   ```
-
-   You project file now look like the following:
-
-   ```xml
-   <Project Sdk="Microsoft.NET.Sdk.Web">
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="HotChocolate.AspNetCore" Version="12.3.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-    </ItemGroup>
-   </Project>
-   ```
 
 1. Build your project.
 

@@ -13,9 +13,6 @@ builder.Services
 var app = builder.Build();
 
 app.UseRouting();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapGraphQL();
-});
+app.MapGraphQL();
 
 app.Run();
