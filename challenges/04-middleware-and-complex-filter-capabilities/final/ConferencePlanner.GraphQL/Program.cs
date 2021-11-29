@@ -25,6 +25,8 @@ builder.Services
     .AddType<SpeakerType>()
     .AddType<TrackType>()
     .AddGlobalObjectIdentification()
+    .AddFiltering()
+    .AddSorting()
     .AddDataLoader<SpeakerByIdDataLoader>()
     .AddDataLoader<SessionByIdDataLoader>();
 

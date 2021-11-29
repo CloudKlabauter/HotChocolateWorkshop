@@ -8,8 +8,10 @@ namespace ConferencePlanner.GraphQL.Speakers;
 public class SpeakerQueries
 {
     [UseApplicationDbContext]
-    public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
-        context.Speakers.ToListAsync();
+    [UsePaging]
+    public IQueryable<Speaker> GetSpeakers(
+           [ScopedService] ApplicationDbContext context) =>
+           context.Speakers.OrderBy(t => t.Name);
 
     public Task<Speaker> GetSpeakerByIdAsync(
         [ID(nameof(Speaker))] int id,
