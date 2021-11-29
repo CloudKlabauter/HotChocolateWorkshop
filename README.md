@@ -18,6 +18,18 @@ Basic experience in development with C# and ASP.NET (Core). Experience with REST
 - SDK: [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 - A GraphQL Client like [Banana Cake Pop](https://chillicream.com/docs/bananacakepop) or [Altair GraphQL Client](https://altair.sirmuel.design/)
 
+## 👷‍♂️ What you'll be building
+
+In this workshop, you'll learn by building a full-featured GraphQL Server with ASP.NET Core and Hot Chocolate from scratch. We'll start from File/New and build up a full-featured GraphQL server with custom middleware, filters, subscription and relay support.
+
+**Database Schema**:
+
+![Database Schema Diagram](images/21-conference-planner-db-diagram.png)
+
+**GraphQL Schema**:
+
+The GraphQL schema can be found [here](challenges/schema.graphql).
+
 ## 🏋️‍♂️ Challenges
 
 The challenges can be solved individually or in teams. We will provide you separate collabaration environment.
@@ -26,15 +38,13 @@ The challenges can be solved individually or in teams. We will provide you separ
 
 [02: GraphQL Query Execution & DataLoader](challenges/02-understanding-dataLoader/README.md)
 
-[03: Schema design approaches](challenges)
+[03: Schema design approaches](challenges/03-schema-design-approaches/README.md)
 
-[04: Understand middlewares](challenges)
+[04: Understand middlewares & Adding filter capabilitiess](challenges/04-middleware-and-complex-filter-capabilities/README.md)
 
-[05: Adding filter capabilitiess](challenges)
+[05: Adding real-time functionality with subscriptions](challenges/05-subscriptions/README.md)
 
-[06: Adding real-time functionality with subscriptions](challenges)
-
-[07: Testing the GraphQL server](challenges)
+[06: Testing the GraphQL server](challenges/06-testing-the-graphql-server/README.md)
 
 ---
 
