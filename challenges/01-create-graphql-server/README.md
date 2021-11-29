@@ -12,10 +12,10 @@
 
 1. Create a new project for our GraphQL Server.
    1. `dotnet new sln -n ConferencePlanner`
-   1. `dotnet new web -n GraphQL`
-   1. `dotnet sln add GraphQL`
+   1. `dotnet new web -n ConferencePlanner.GraphQL`
+   1. `dotnet sln add ConferencePlanner.GraphQL`
 1. Add a new folder `Data` where we want to place all our database related code.
-   1. `mkdir GraphQL/Data`
+   1. `mkdir ConferencePlanner.GraphQL/Data`
 1. Add a new file `Speaker.cs` in the `Data` directory using the following code:
 
    ```csharp
@@ -84,7 +84,7 @@
 ## Configuring EF Migrations
 
 1. Add a reference to the NuGet package `Microsoft.EntityFrameworkCore.Tools` version `6.0.0`.
-   1. `dotnet add GraphQL package Microsoft.EntityFrameworkCore.Tools --version 6.0.0`
+   1. `dotnet add ConferencePlanner.GraphQL package Microsoft.EntityFrameworkCore.Tools --version 6.0.0`
 
 ### Option 1 - Visual Studio: Package Manager Console
 
@@ -111,9 +111,9 @@
 3. Run the following commands in the command prompt:
 
    ```console
-   dotnet build GraphQL
-   dotnet ef migrations add Initial --project GraphQL
-   dotnet ef database update --project GraphQL
+   dotnet build ConferencePlanner.GraphQL
+   dotnet ef migrations add Initial --project ConferencePlanner.GraphQL
+   dotnet ef database update --project ConferencePlanner.GraphQL
    ```
 
 Commands Explained
@@ -128,7 +128,7 @@ Commands Explained
 ## Adding GraphQL
 
 1. Add a reference to the NuGet package package `HotChocolate.AspNetCore` version `12.3.2`.
-   1. `dotnet add GraphQL package HotChocolate.AspNetCore --version 12.3.2`
+   1. `dotnet add ConferencePlanner.GraphQL package HotChocolate.AspNetCore --version 12.3.2`
 1. Next we'll create our query root type (`Query.cs`) and add a resolver that fetches all of our speakers.
 
    ```csharp
@@ -190,7 +190,7 @@ Commands Explained
 
 1. Start the server.
 
-   1. `dotnet run --project GraphQL`
+   1. `dotnet run --project ConferencePlanner.GraphQL`
 
    ![Start GraphQL server](../../images/1-start-server.png)
 
@@ -287,7 +287,7 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
 
 1. Start the server again in order to validate if it is working properly.
 
-   1. `dotnet run --project GraphQL`
+   1. `dotnet run --project ConferencePlanner.GraphQL`
 
 1. Explore with Banana Cake Pop the changes schema to the schema. There should now be a mutation type and the `addSpeaker` mutation.
    ![GraphQL type explorer](../../images/4-bcp-schema-explorer-mutation.png)
@@ -322,7 +322,7 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
 
 The GraphQL type system distinguishes between nullable and non-nullable types. This helps the consumer of the API by providing guarantees when a field value can be trusted to never be null or when an input is not allowed to be null. The ability to rely on such type information simplifies the code of the null since we do not have to write a ton of null checks for things that will never be null.
 
-1. Open the project file of your GraphQL server project `GraphQL.csproj` and add the following property:
+1. Open the project file of your GraphQL server project `ConferencePlanner.GraphQL.csproj` and add the following property:
 
    ```xml
    <Nullable>enable</Nullable>
@@ -403,7 +403,7 @@ The GraphQL type system distinguishes between nullable and non-nullable types. T
 
 1. Start your server again and verify the nullability changes in your schema explorer.
 
-   1. `dotnet run --project GraphQL`
+   1. `dotnet run --project ConferencePlanner.GraphQL`
 
    ![Query speaker names](../../images/39-bcp-verify-nullability.png)
 

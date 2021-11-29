@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL", "GraphQL\GraphQL.csproj", "{488F821E-F63F-4A70-83C6-F29CB8451187}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConferencePlanner.GraphQL", "ConferencePlanner.GraphQL\ConferencePlanner.GraphQL.csproj", "{488F821E-F63F-4A70-83C6-F29CB8451187}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

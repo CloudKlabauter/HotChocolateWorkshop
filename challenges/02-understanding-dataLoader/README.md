@@ -13,7 +13,7 @@ The GraphQL execution engine will always try to execute fields in parallel in or
 
 1. Start your GraphQL Server.
 
-   1. `dotnet run --project Graphql`
+   1. `dotnet run --project ConferencePlanner.Graphql`
 
 1. Start Banana Cake Pop and run the following query:
 
@@ -54,7 +54,7 @@ The GraphQL execution engine will always try to execute fields in parallel in or
 
 1. Create a new folder called `Extensions`
 
-   1. `mkdir GraphQL/Extensions`
+   1. `mkdir ConferencePlanner.GraphQL/Extensions`
 
 1. Create a new file located in `Extensions` called `ObjectFieldDescriptorExtensions.cs` with the following code:
 
@@ -161,7 +161,7 @@ The GraphQL execution engine will always try to execute fields in parallel in or
 
 1. Start your GraphQL Server again.
 
-   1. `dotnet run --project Graphql`
+   1. `dotnet run --project ConferencePlanner.Graphql`
 
 1. Start Banana Cake Pop again and run the following query again:
 
@@ -401,19 +401,19 @@ Now, that we have all of our models in we need to create another migration and u
 1. First, validate your project by building it.
 
    ```console
-   dotnet build GraphQL
+   dotnet build ConferencePlanner.GraphQL
    ```
 
 1. Next, generate a new migration for the database.
 
    ```console
-   dotnet ef migrations add Refactoring --project GraphQL
+   dotnet ef migrations add Refactoring --project ConferencePlanner.GraphQL
    ```
 
 1. Last, update the database with the new migration.
 
    ```console
-   dotnet ef database update --project GraphQL
+   dotnet ef database update --project ConferencePlanner.GraphQL
    ```
 
 After having everything in let us have a look at our schema and see if something changed.
@@ -421,7 +421,7 @@ After having everything in let us have a look at our schema and see if something
 1. Start, your server.
 
    ```console
-   dotnet run --project GraphQL
+   dotnet run --project ConferencePlanner.GraphQL
    ```
 
 1. Open Banana Cake Pop and refresh the schema.
@@ -435,7 +435,7 @@ After having everything in let us have a look at our schema and see if something
 1. Add a new directory `DataLoader` to your project:
 
    ```console
-   mkdir GraphQL/DataLoader
+   mkdir ConferencePlanner.GraphQL/DataLoader
    ```
 
 1. Add a new class called `SpeakerByIdDataLoader` to the `DataLoader` directory with the following code:
@@ -521,7 +521,7 @@ After having everything in let us have a look at our schema and see if something
 1. Let us have a look at the new schema with Banana Cake Pop. For this start your server and refresh Banana Cake Pop.
 
    ```console
-   dotnet run --project GraphQL
+   dotnet run --project ConferencePlanner.GraphQL
    ```
 
    ![Connect to GraphQL server with Banana Cake Pop](../../images/11-bcp-schema-updated.png)
@@ -599,7 +599,7 @@ In our specific case, we want to make the GraphQL API nicer and remove the relat
 1. Create a new directory `Types`.
 
    ```console
-   mkdir GraphQL/Types
+   mkdir ConferencePlanner.GraphQL/Types
    ```
 
 1. Create a new class `SpeakerType` in the directory types with the following code:
@@ -674,7 +674,7 @@ In our specific case, we want to make the GraphQL API nicer and remove the relat
 1. Start your GraphQL server again.
 
    ```console
-   dotnet run --project GraphQL
+   dotnet run --project ConferencePlanner.GraphQL
    ```
 
 1. Go back to Banana Cake Pop, refresh the schema and execute the following query:
