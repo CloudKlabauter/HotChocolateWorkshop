@@ -1,10 +1,9 @@
 using ConferencePlanner.GraphQL.Data;
 
-namespace ConferencePlanner.GraphQL
+namespace ConferencePlanner.GraphQL;
+
+public class Query
 {
-    public class Query
-    {
-        public IQueryable<Speaker> GetSpeakers([Service] ApplicationDbContext context) =>
-            context.Speakers;
-    }
+    public IQueryable<Speaker> GetSpeakers([Service] ApplicationDbContext context) =>
+        context.Speakers;
 }

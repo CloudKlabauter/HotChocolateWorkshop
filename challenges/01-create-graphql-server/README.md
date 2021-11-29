@@ -21,22 +21,21 @@
    ```csharp
    using System.ComponentModel.DataAnnotations;
 
-   namespace ConferencePlanner.GraphQL.Data
+   namespace ConferencePlanner.GraphQL.Data;
+
+   public class Speaker
    {
-       public class Speaker
-       {
-           public int Id { get; set; }
+      public int Id { get; set; }
 
-           [Required]
-           [StringLength(200)]
-           public string Name { get; set; }
+      [Required]
+      [StringLength(200)]
+      public string Name { get; set; }
 
-           [StringLength(4000)]
-           public string Bio { get; set; }
+      [StringLength(4000)]
+      public string Bio { get; set; }
 
-           [StringLength(1000)]
-           public virtual string WebSite { get; set; }
-       }
+      [StringLength(1000)]
+      public virtual string WebSite { get; set; }
    }
    ```
 
@@ -51,17 +50,16 @@
    ```csharp
    using Microsoft.EntityFrameworkCore;
 
-   namespace ConferencePlanner.GraphQL.Data
-   {
-       public class ApplicationDbContext : DbContext
-       {
-           public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-               : base(options)
-           {
-           }
+   namespace ConferencePlanner.GraphQL.Data;
 
-           public DbSet<Speaker> Speakers { get; set; }
-       }
+   public class ApplicationDbContext : DbContext
+   {
+      public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+         : base(options)
+      {
+      }
+
+      public DbSet<Speaker> Speakers { get; set; }
    }
    ```
 
@@ -138,13 +136,12 @@ Commands Explained
    ```csharp
    using ConferencePlanner.GraphQL.Data;
 
-   namespace ConferencePlanner.GraphQL
+   namespace ConferencePlanner.GraphQL;
+
+   public class Query
    {
-       public class Query
-       {
-           public IQueryable<Speaker> GetSpeakers([Service] ApplicationDbContext context) =>
-               context.Speakers;
-       }
+      public IQueryable<Speaker> GetSpeakers([Service] ApplicationDbContext context) =>
+         context.Speakers;
    }
    ```
 
@@ -206,7 +203,7 @@ Commands Explained
 
 So, far we have added the Query root type to our schema, which allows us to query speakers. However, at this point, there is no way to add or modify any data. In this section, we are going to add the root Mutation type to add new speakers to our database.
 
-> For mutations we are using the [relay mutation pattern](https://relay.dev/docs/en/graphql-server-specification.html#mutations) which is commonly used in GraphQL.
+> For mutations we are using the [relay mutation pattern](https://relay.dev/docs/principles-and-architecture/thinking-in-graphql/#mutations) which is commonly used in GraphQL.
 
 A mutation consists of three components, the **input**, the **payload** and the **mutation** itself. In our case we want to create a mutation called `addSpeaker`, by convention, mutations are named as verbs, their inputs are the name with "Input" appended at the end, and they return an object that is the name with "Payload" appended.
 
@@ -215,13 +212,12 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
 1. Add a file `AddSpeakerInput.cs` to your project with the following code:
 
    ```csharp
-   namespace ConferencePlanner.GraphQL
-   {
-       public record AddSpeakerInput(
-           string Name,
-           string Bio,
-           string WebSite);
-   }
+   namespace ConferencePlanner.GraphQL;
+
+   public record AddSpeakerInput(
+      string Name,
+      string Bio,
+      string WebSite);
    ```
 
    > The input and output (payload) both contain a client mutation identifier used to reconcile requests and responses in some client frameworks.
@@ -231,17 +227,16 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
    ```csharp
    using ConferencePlanner.GraphQL.Data;
 
-   namespace ConferencePlanner.GraphQL
-   {
-       public class AddSpeakerPayload
-       {
-           public AddSpeakerPayload(Speaker speaker)
-           {
-               Speaker = speaker;
-           }
+   namespace ConferencePlanner.GraphQL;
 
-           public Speaker Speaker { get; }
-       }
+   public class AddSpeakerPayload
+   {
+      public AddSpeakerPayload(Speaker speaker)
+      {
+         Speaker = speaker;
+      }
+
+      public Speaker Speaker { get; }
    }
    ```
 
@@ -250,27 +245,26 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
    ```csharp
    using ConferencePlanner.GraphQL.Data;
 
-   namespace ConferencePlanner.GraphQL
+   namespace ConferencePlanner.GraphQL;
+
+   public class Mutation
    {
-       public class Mutation
-       {
-           public async Task<AddSpeakerPayload> AddSpeakerAsync(
-               AddSpeakerInput input,
-               [Service] ApplicationDbContext context)
-           {
-               var speaker = new Speaker
-               {
-                   Name = input.Name,
-                   Bio = input.Bio,
-                   WebSite = input.WebSite
-               };
+      public async Task<AddSpeakerPayload> AddSpeakerAsync(
+         AddSpeakerInput input,
+         [Service] ApplicationDbContext context)
+      {
+         var speaker = new Speaker
+         {
+               Name = input.Name,
+               Bio = input.Bio,
+               WebSite = input.WebSite
+         };
 
-               context.Speakers.Add(speaker);
-               await context.SaveChangesAsync();
+         context.Speakers.Add(speaker);
+         await context.SaveChangesAsync();
 
-               return new AddSpeakerPayload(speaker);
-           }
-       }
+         return new AddSpeakerPayload(speaker);
+      }
    }
    ```
 
@@ -339,35 +333,33 @@ The GraphQL type system distinguishes between nullable and non-nullable types. T
    ```csharp
    using System.ComponentModel.DataAnnotations;
 
-   namespace ConferencePlanner.GraphQL.Data
+   namespace ConferencePlanner.GraphQL.Data;
+
+   public class Speaker
    {
-       public class Speaker
-       {
-           public int Id { get; set; }
+      public int Id { get; set; }
 
-           [Required]
-           [StringLength(200)]
-           public string? Name { get; set; }
+      [Required]
+      [StringLength(200)]
+      public string? Name { get; set; }
 
-           [StringLength(4000)]
-           public string? Bio { get; set; }
+      [StringLength(4000)]
+      public string? Bio { get; set; }
 
-           [StringLength(1000)]
-           public virtual string? WebSite { get; set; }
-       }
+      [StringLength(1000)]
+      public virtual string? WebSite { get; set; }
    }
    ```
 
 1. Now update the input type by marking nullable fields.
 
    ```csharp
-   namespace ConferencePlanner.GraphQL
-   {
-       public record AddSpeakerInput(
-           string Name,
-           string? Bio,
-           string? WebSite);
-   }
+   namespace ConferencePlanner.GraphQL;
+
+   public record AddSpeakerInput(
+      string Name,
+      string? Bio,
+      string? WebSite);
    ```
 
    > The payload type can stay for now as it is.
