@@ -433,4 +433,6 @@ Filters like paging is a middleware that can be applied on `IQueryable`, like me
 
 In this session, we have looked at what field middleware are and how we can use them to add additional processing logic to our field resolver pipeline.
 
+We have also learned how we can use GraphQL subscription to provide real-time events. GraphQL makes it easy to work with real-time data since we can specify what data we want to receive when an event happens on our system.
+
 [**<< Session #3 - GraphQL schema design**](../03-schema-design-approaches/README.md) | [**Session #5 - Adding real-time functionality with subscriptions >>**](../05-subscriptions/README.md)
