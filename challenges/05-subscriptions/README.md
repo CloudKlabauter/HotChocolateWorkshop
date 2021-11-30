@@ -88,11 +88,13 @@ We now have the base types integrated and can start adding the attendee mutation
    ```csharp
     namespace ConferencePlanner.GraphQL.Attendees;
 
-    public record RegisterAttendeeInput(
-        string FirstName,
-        string LastName,
-        string UserName,
-        string EmailAddress);
+    public class RegisterAttendeeInput
+    {
+        public string FirstName { get; set; } = default!;
+        public string LastName { get; set; } = default!;
+        public string UserName { get; set; } = default!;
+        public string EmailAddress { get; set; } = default!;
+    }
    ```
 
 1. Now, add the `RegisterAttendeePayload.cs` class to the `Attendees` directory.
@@ -161,11 +163,15 @@ Now that we have the mutation in to register new attendees, let us move on to ad
 
     namespace ConferencePlanner.GraphQL.Attendees;
 
-    public record CheckInAttendeeInput(
+    public class CheckInAttendeeInput
+    {
+
         [ID(nameof(Session))]
-        int SessionId,
+        public int SessionId { get; set; }
+
         [ID(nameof(Attendee))]
-        int AttendeeId);
+        public int AttendeeId { get; set; }
+    }
    ```
 
 1. Next we add the payload type for the `CheckInAttendeePayload.cs` Mutation:

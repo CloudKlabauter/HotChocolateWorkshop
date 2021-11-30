@@ -214,10 +214,12 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
    ```csharp
    namespace ConferencePlanner.GraphQL;
 
-   public record AddSpeakerInput(
-      string Name,
-      string Bio,
-      string WebSite);
+   public class AddSpeakerInput
+   {
+      public string Name { get; set; }
+      public string Bio { get; set; }
+      public string WebSite { get; set; }
+   }
    ```
 
    > The input and output (payload) both contain a client mutation identifier used to reconcile requests and responses in some client frameworks.
@@ -356,10 +358,12 @@ The GraphQL type system distinguishes between nullable and non-nullable types. T
    ```csharp
    namespace ConferencePlanner.GraphQL;
 
-   public record AddSpeakerInput(
-      string Name,
-      string? Bio,
-      string? WebSite);
+   public class AddSpeakerInput
+   {
+      public string Name { get; set; } = default!;
+      public string? Bio { get; set; }
+      public string? WebSite { get; set; }
+   }
    ```
 
    > The payload type can stay for now as it is.

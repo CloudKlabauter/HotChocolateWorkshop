@@ -1,3 +1,6 @@
 namespace ConferencePlanner.GraphQL.Tracks;
 
-public record AddTrackInput(string Name);
+public class AddTrackInput
+{
+    public string Name { get; set; } = default!;
+}

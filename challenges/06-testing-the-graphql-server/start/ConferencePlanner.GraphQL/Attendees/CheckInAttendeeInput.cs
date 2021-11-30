@@ -2,8 +2,12 @@ using ConferencePlanner.GraphQL.Data;
 
 namespace ConferencePlanner.GraphQL.Attendees;
 
-public record CheckInAttendeeInput(
+public class CheckInAttendeeInput
+{
+
     [ID(nameof(Session))]
-        int SessionId,
+    public int SessionId { get; set; }
+
     [ID(nameof(Attendee))]
-        int AttendeeId);
+    public int AttendeeId { get; set; }
+}
