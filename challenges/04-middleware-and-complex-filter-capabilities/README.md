@@ -25,7 +25,6 @@ context.Use(next => async context =>
     // invoke next middleware component in the chain.
     await next(context);
 
-
     // do some more logic
 })
 ```
@@ -65,24 +64,24 @@ After `next` has finished executing, the middleware checks if the result is a `s
 1. Create class `ObjectFieldDescriptorExtensions.cs` in `Extensions` and add the `UseUpperCase` extension method
 
    ```csharp
-    namespace ConferencePlanner.GraphQL;
+   namespace ConferencePlanner.GraphQL;
 
-    public static class ObjectFieldDescriptorExtensions
-    {
-        public static IObjectFieldDescriptor UseUpperCase(
-              this IObjectFieldDescriptor descriptor)
-        {
-            return descriptor.Use(next => async context =>
-            {
-                await next(context);
+   public static class ObjectFieldDescriptorExtensions
+   {
+       public static IObjectFieldDescriptor UseUpperCase(
+             this IObjectFieldDescriptor descriptor)
+       {
+           return descriptor.Use(next => async context =>
+           {
+               await next(context);
 
-                if (context.Result is string s)
-                {
-                    context.Result = s.ToUpperInvariant();
-                }
-            });
-        }
-    }
+               if (context.Result is string s)
+               {
+                   context.Result = s.ToUpperInvariant();
+               }
+           });
+       }
+   }
    ```
 
 1. Head over to the `TrackType` in the `Types` folder and use the middleware on the `name` field.
@@ -131,21 +130,21 @@ To use middleware on plain C# types, we can wrap them in so-called descriptor at
 1. Create a new class `UseUpperCaseAttribute.cs` in the `Extensions` directory and add the following code:
 
    ```csharp
-    using System.Reflection;
-    using HotChocolate.Types.Descriptors;
+   using System.Reflection;
+   using HotChocolate.Types.Descriptors;
 
-    namespace ConferencePlanner.GraphQL;
+   namespace ConferencePlanner.GraphQL;
 
-    public class UseUpperCaseAttribute : ObjectFieldDescriptorAttribute
-    {
-        public override void OnConfigure(
-            IDescriptorContext context,
-            IObjectFieldDescriptor descriptor,
-            MemberInfo member)
-        {
-            descriptor.UseUpperCase();
-        }
-    }
+   public class UseUpperCaseAttribute : ObjectFieldDescriptorAttribute
+   {
+       public override void OnConfigure(
+           IDescriptorContext context,
+           IObjectFieldDescriptor descriptor,
+           MemberInfo member)
+       {
+           descriptor.UseUpperCase();
+       }
+   }
    ```
 
    > This new attribute can now be applied to any property or method on a plain C# type.
@@ -381,19 +380,19 @@ Filters like paging is a middleware that can be applied on `IQueryable`, like me
 1. Create a new `SessionFilterInputType.cs` in the `Sessions` directory with the following code:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
-    using HotChocolate.Data.Filters;
+   using ConferencePlanner.GraphQL.Data;
+   using HotChocolate.Data.Filters;
 
-    namespace ConferencePlanner.GraphQL.Types;
+   namespace ConferencePlanner.GraphQL.Types;
 
-    public class SessionFilterInputType : FilterInputType<Session>
-    {
-        protected override void Configure(IFilterInputTypeDescriptor<Session> descriptor)
-        {
-              descriptor.Ignore(t => t.Id);
-              descriptor.Ignore(t => t.TrackId);
-        }
-    }
+   public class SessionFilterInputType : FilterInputType<Session>
+   {
+       protected override void Configure(IFilterInputTypeDescriptor<Session> descriptor)
+       {
+           descriptor.Ignore(t => t.Id);
+           descriptor.Ignore(t => t.TrackId);
+       }
+   }
    ```
 
    > We essentially have remove the ID fields and leave the rest in.

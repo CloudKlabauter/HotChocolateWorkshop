@@ -27,56 +27,56 @@ Before we can start with introducing our new subscriptions, we need first to bri
 1. Create a new class `AttendeeQueries.cs` located in the `Attendees` directory with the following content:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    [ExtendObjectType("Query")]
-    public class AttendeeQueries
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        [UsePaging]
-        public IQueryable<Attendee> GetAttendees(
-            [ScopedService] ApplicationDbContext context) =>
-            context.Attendees;
+   [ExtendObjectType("Query")]
+   public class AttendeeQueries
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       [UsePaging]
+       public IQueryable<Attendee> GetAttendees(
+           [ScopedService] ApplicationDbContext context) =>
+           context.Attendees;
 
-        public Task<Attendee> GetAttendeeByIdAsync(
-            [ID(nameof(Attendee))]int id,
-            AttendeeByIdDataLoader attendeeById,
-            CancellationToken cancellationToken) =>
-            attendeeById.LoadAsync(id, cancellationToken);
+       public Task<Attendee> GetAttendeeByIdAsync(
+           [ID(nameof(Attendee))]int id,
+           AttendeeByIdDataLoader attendeeById,
+           CancellationToken cancellationToken) =>
+           attendeeById.LoadAsync(id, cancellationToken);
 
-        public async Task<IEnumerable<Attendee>> GetAttendeesByIdAsync(
-            [ID(nameof(Attendee))]int[] ids,
-            AttendeeByIdDataLoader attendeeById,
-            CancellationToken cancellationToken) =>
-            await attendeeById.LoadAsync(ids, cancellationToken);
-    }
+       public async Task<IEnumerable<Attendee>> GetAttendeesByIdAsync(
+           [ID(nameof(Attendee))]int[] ids,
+           AttendeeByIdDataLoader attendeeById,
+           CancellationToken cancellationToken) =>
+           await attendeeById.LoadAsync(ids, cancellationToken);
+   }
    ```
 
 1. Add a class `AttendeePayloadBase.cs` to the `Attendees` directory.
 
    ```csharp
-    using ConferencePlanner.GraphQL.Common;
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Common;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    public class AttendeePayloadBase : Payload
-    {
-        protected AttendeePayloadBase(Attendee attendee)
-        {
-            Attendee = attendee;
-        }
+   public class AttendeePayloadBase : Payload
+   {
+       protected AttendeePayloadBase(Attendee attendee)
+       {
+           Attendee = attendee;
+       }
 
-        protected AttendeePayloadBase(IReadOnlyList<UserError> errors)
-            : base(errors)
-        {
-        }
+       protected AttendeePayloadBase(IReadOnlyList<UserError> errors)
+           : base(errors)
+       {
+       }
 
-        public Attendee? Attendee { get; }
-    }
+       public Attendee? Attendee { get; }
+   }
    ```
 
 ### Add `registerAttendee` Mutation
@@ -86,70 +86,70 @@ We now have the base types integrated and can start adding the attendee mutation
 1. Add a new class `RegisterAttendeeInput.cs` to the `Attendees` directory.
 
    ```csharp
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    public class RegisterAttendeeInput
-    {
-        public string FirstName { get; set; } = default!;
-        public string LastName { get; set; } = default!;
-        public string UserName { get; set; } = default!;
-        public string EmailAddress { get; set; } = default!;
-    }
+   public class RegisterAttendeeInput
+   {
+       public string FirstName { get; set; } = default!;
+       public string LastName { get; set; } = default!;
+       public string UserName { get; set; } = default!;
+       public string EmailAddress { get; set; } = default!;
+   }
    ```
 
 1. Now, add the `RegisterAttendeePayload.cs` class to the `Attendees` directory.
 
    ```csharp
-    using ConferencePlanner.GraphQL.Common;
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Common;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    public class RegisterAttendeePayload : AttendeePayloadBase
-    {
-        public RegisterAttendeePayload(Attendee attendee)
-            : base(attendee)
-        {
-        }
+   public class RegisterAttendeePayload : AttendeePayloadBase
+   {
+       public RegisterAttendeePayload(Attendee attendee)
+           : base(attendee)
+       {
+       }
 
-        public RegisterAttendeePayload(UserError error)
-            : base(new[] { error })
-        {
-        }
-    }
+       public RegisterAttendeePayload(UserError error)
+           : base(new[] { error })
+       {
+       }
+   }
    ```
 
 1. Add the `AttendeeMutations.cs` with the `RegisterAttendeeAsync` resolver to the `Attendees` directory.
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    [ExtendObjectType("Mutation")]
-    public class AttendeeMutations
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<RegisterAttendeePayload> RegisterAttendeeAsync(
-            RegisterAttendeeInput input,
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken)
-        {
-            var attendee = new Attendee
-            {
-                FirstName = input.FirstName,
-                LastName = input.LastName,
-                UserName = input.UserName,
-                EmailAddress = input.EmailAddress
-            };
+   [ExtendObjectType("Mutation")]
+   public class AttendeeMutations
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<RegisterAttendeePayload> RegisterAttendeeAsync(
+           RegisterAttendeeInput input,
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken)
+       {
+           var attendee = new Attendee
+           {
+               FirstName = input.FirstName,
+               LastName = input.LastName,
+               UserName = input.UserName,
+               EmailAddress = input.EmailAddress
+           };
 
-            context.Attendees.Add(attendee);
+           context.Attendees.Add(attendee);
 
-            await context.SaveChangesAsync(cancellationToken);
+           await context.SaveChangesAsync(cancellationToken);
 
-            return new RegisterAttendeePayload(attendee);
-        }
-    }
+           return new RegisterAttendeePayload(attendee);
+       }
+   }
    ```
 
 ### Add `checkInAttendee` Mutation
@@ -159,57 +159,56 @@ Now that we have the mutation in to register new attendees, let us move on to ad
 1. Add the `CheckInAttendeeInput.cs` to the `Attendees` directory.
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    public class CheckInAttendeeInput
-    {
+   public class CheckInAttendeeInput
+   {
+       [ID(nameof(Session))]
+       public int SessionId { get; set; }
 
-        [ID(nameof(Session))]
-        public int SessionId { get; set; }
-
-        [ID(nameof(Attendee))]
-        public int AttendeeId { get; set; }
-    }
+       [ID(nameof(Attendee))]
+       public int AttendeeId { get; set; }
+   }
    ```
 
 1. Next we add the payload type for the `CheckInAttendeePayload.cs` Mutation:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Common;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using ConferencePlanner.GraphQL.Common;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    public class CheckInAttendeePayload : AttendeePayloadBase
-    {
-        private int? _sessionId;
+   public class CheckInAttendeePayload : AttendeePayloadBase
+   {
+       private int? _sessionId;
 
-        public CheckInAttendeePayload(Attendee attendee, int sessionId)
-            : base(attendee)
-        {
-            _sessionId = sessionId;
-        }
+       public CheckInAttendeePayload(Attendee attendee, int sessionId)
+           : base(attendee)
+       {
+           _sessionId = sessionId;
+       }
 
-        public CheckInAttendeePayload(UserError error)
-            : base(new[] { error })
-        {
-        }
+       public CheckInAttendeePayload(UserError error)
+           : base(new[] { error })
+       {
+       }
 
-        public async Task<Session?> GetSessionAsync(
-            SessionByIdDataLoader sessionById,
-            CancellationToken cancellationToken)
-        {
-            if (_sessionId.HasValue)
-            {
-                return await sessionById.LoadAsync(_sessionId.Value, cancellationToken);
-            }
+       public async Task<Session?> GetSessionAsync(
+           SessionByIdDataLoader sessionById,
+           CancellationToken cancellationToken)
+       {
+           if (_sessionId.HasValue)
+           {
+               return await sessionById.LoadAsync(_sessionId.Value, cancellationToken);
+           }
 
-            return null;
-        }
-    }
+           return null;
+       }
+   }
    ```
 
 1. Head back to the `AttendeeMutations.cs` class in the `Attendees` directory and add the `CheckInAttendeeAsync` resolver to it:
@@ -245,62 +244,62 @@ Now that we have the mutation in to register new attendees, let us move on to ad
    Your `AttendeeMutations` class should now look like the following:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Common;
-    using ConferencePlanner.GraphQL.Data;
-    using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Common;
+   using ConferencePlanner.GraphQL.Data;
+   using Microsoft.EntityFrameworkCore;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    [ExtendObjectType("Mutation")]
-    public class AttendeeMutations
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<RegisterAttendeePayload> RegisterAttendeeAsync(
-            RegisterAttendeeInput input,
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken)
-        {
-            var attendee = new Attendee
-            {
-                FirstName = input.FirstName,
-                LastName = input.LastName,
-                UserName = input.UserName,
-                EmailAddress = input.EmailAddress
-            };
+   [ExtendObjectType("Mutation")]
+   public class AttendeeMutations
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<RegisterAttendeePayload> RegisterAttendeeAsync(
+           RegisterAttendeeInput input,
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken)
+       {
+           var attendee = new Attendee
+           {
+               FirstName = input.FirstName,
+               LastName = input.LastName,
+               UserName = input.UserName,
+               EmailAddress = input.EmailAddress
+           };
 
-            context.Attendees.Add(attendee);
+           context.Attendees.Add(attendee);
 
-            await context.SaveChangesAsync(cancellationToken);
+           await context.SaveChangesAsync(cancellationToken);
 
-            return new RegisterAttendeePayload(attendee);
-        }
+           return new RegisterAttendeePayload(attendee);
+       }
 
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<CheckInAttendeePayload> CheckInAttendeeAsync(
-            CheckInAttendeeInput input,
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken)
-        {
-            Attendee? attendee = await context.Attendees.FirstOrDefaultAsync(
-                t => t.Id == input.AttendeeId, cancellationToken);
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<CheckInAttendeePayload> CheckInAttendeeAsync(
+           CheckInAttendeeInput input,
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken)
+       {
+           Attendee? attendee = await context.Attendees.FirstOrDefaultAsync(
+               t => t.Id == input.AttendeeId, cancellationToken);
 
-            if (attendee is null)
-            {
-                return new CheckInAttendeePayload(
-                    new UserError("Attendee not found.", "ATTENDEE_NOT_FOUND"));
-            }
+           if (attendee is null)
+           {
+               return new CheckInAttendeePayload(
+                   new UserError("Attendee not found.", "ATTENDEE_NOT_FOUND"));
+           }
 
-            attendee.SessionsAttendees.Add(
-                new SessionAttendee
-                {
-                    SessionId = input.SessionId
-                });
+           attendee.SessionsAttendees.Add(
+               new SessionAttendee
+               {
+                   SessionId = input.SessionId
+               });
 
-            await context.SaveChangesAsync(cancellationToken);
+           await context.SaveChangesAsync(cancellationToken);
 
-            return new CheckInAttendeePayload(attendee, input.SessionId);
-        }
-    }
+           return new CheckInAttendeePayload(attendee, input.SessionId);
+       }
+   }
    ```
 
 1. Head over to the `Program.cs` and register the query and mutation type that we have just added with the schema builder.
@@ -399,23 +398,22 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
 1. Add a new class `SessionSubscriptions` to the `Sessions` directory.
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
+   namespace ConferencePlanner.GraphQL.Sessions;
 
-    namespace ConferencePlanner.GraphQL.Sessions;
-
-    [ExtendObjectType("Subscription")]
-    public class SessionSubscriptions
-    {
-        [Subscribe]
-        [Topic]
-        public Task<Session> OnSessionScheduledAsync(
-            [EventMessage] int sessionId,
-            SessionByIdDataLoader sessionById,
-            CancellationToken cancellationToken) =>
-            sessionById.LoadAsync(sessionId, cancellationToken);
-    }
+   [ExtendObjectType("Subscription")]
+   public class SessionSubscriptions
+   {
+       [Subscribe]
+       [Topic]
+       public Task<Session> OnSessionScheduledAsync(
+           [EventMessage] int sessionId,
+           SessionByIdDataLoader sessionById,
+           CancellationToken cancellationToken) =>
+           sessionById.LoadAsync(sessionId, cancellationToken);
+   }
    ```
 
    > The `[Topic]` attribute can be put on the method or a parameter of the method and will infer the pub/sub-topic for this subscription.
@@ -462,7 +460,7 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
    public async Task<ScheduleSessionPayload> ScheduleSessionAsync(
        ScheduleSessionInput input,
        [ScopedService] ApplicationDbContext context,
-       [Service]ITopicEventSender eventSender)
+       [Service] ITopicEventSender eventSender)
    {
        if (input.EndTime < input.StartTime)
        {
@@ -493,7 +491,7 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
    }
    ```
 
-   > Our improved resolver now injects `[Service]ITopicEventSender eventSender`. This gives us access to send messages to the underlying pub/sub-system.
+   > Our improved resolver now injects `[Service] ITopicEventSender eventSender`. This gives us access to send messages to the underlying pub/sub-system.
 
    > After `await context.SaveChangesAsync();` we are sending in a new message.
 
@@ -617,76 +615,75 @@ The `onSessionScheduled` was quite simple since we did not subscribe to a dynami
 1. Add a new class `SessionAttendeeCheckIn` to the `Attendees` directory. This will be our subscription payload.
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   public class SessionAttendeeCheckIn
+   {
+       public SessionAttendeeCheckIn(int attendeeId, int sessionId)
+       {
+           AttendeeId = attendeeId;
+           SessionId = sessionId;
+       }
 
-    public class SessionAttendeeCheckIn
-    {
-        public SessionAttendeeCheckIn(int attendeeId, int sessionId)
-        {
-            AttendeeId = attendeeId;
-            SessionId = sessionId;
-        }
+       [ID(nameof(Attendee))]
+       public int AttendeeId { get; }
 
-        [ID(nameof(Attendee))]
-        public int AttendeeId { get; }
+       [ID(nameof(Session))]
+       public int SessionId { get; }
 
-        [ID(nameof(Session))]
-        public int SessionId { get; }
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<int> CheckInCountAsync(
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken) =>
+           await context.Sessions
+               .Where(session => session.Id == SessionId)
+               .SelectMany(session => session.SessionAttendees)
+               .CountAsync(cancellationToken);
 
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<int> CheckInCountAsync(
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken) =>
-            await context.Sessions
-                .Where(session => session.Id == SessionId)
-                .SelectMany(session => session.SessionAttendees)
-                .CountAsync(cancellationToken);
+       public Task<Attendee> GetAttendeeAsync(
+           AttendeeByIdDataLoader attendeeById,
+           CancellationToken cancellationToken) =>
+           attendeeById.LoadAsync(AttendeeId, cancellationToken);
 
-        public Task<Attendee> GetAttendeeAsync(
-            AttendeeByIdDataLoader attendeeById,
-            CancellationToken cancellationToken) =>
-            attendeeById.LoadAsync(AttendeeId, cancellationToken);
-
-        public Task<Session> GetSessionAsync(
-            SessionByIdDataLoader sessionById,
-            CancellationToken cancellationToken) =>
-            sessionById.LoadAsync(AttendeeId, cancellationToken);
-    }
+       public Task<Session> GetSessionAsync(
+           SessionByIdDataLoader sessionById,
+           CancellationToken cancellationToken) =>
+           sessionById.LoadAsync(AttendeeId, cancellationToken);
+   }
    ```
 
 1. Create a new class, `AttendeeSubscriptions` and put it in the `Attendees` directory.
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
-    using HotChocolate.Execution;
-    using HotChocolate.Subscriptions;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
+   using HotChocolate.Execution;
+   using HotChocolate.Subscriptions;
 
-    namespace ConferencePlanner.GraphQL.Attendees;
+   namespace ConferencePlanner.GraphQL.Attendees;
 
-    [ExtendObjectType("Subscription")]
-    public class AttendeeSubscriptions
-    {
-        [Subscribe(With = nameof(SubscribeToOnAttendeeCheckedInAsync))]
-        public SessionAttendeeCheckIn OnAttendeeCheckedIn(
-            [ID(nameof(Session))] int sessionId,
-            [EventMessage] int attendeeId,
-            SessionByIdDataLoader sessionById,
-            CancellationToken cancellationToken) =>
-            new SessionAttendeeCheckIn(attendeeId, sessionId);
+   [ExtendObjectType("Subscription")]
+   public class AttendeeSubscriptions
+   {
+       [Subscribe(With = nameof(SubscribeToOnAttendeeCheckedInAsync))]
+       public SessionAttendeeCheckIn OnAttendeeCheckedIn(
+           [ID(nameof(Session))] int sessionId,
+           [EventMessage] int attendeeId,
+           SessionByIdDataLoader sessionById,
+           CancellationToken cancellationToken) =>
+           new SessionAttendeeCheckIn(attendeeId, sessionId);
 
-        public async ValueTask<ISourceStream<int>> SubscribeToOnAttendeeCheckedInAsync(
-            int sessionId,
-            [Service] ITopicEventReceiver eventReceiver,
-            CancellationToken cancellationToken) =>
-            await eventReceiver.SubscribeAsync<string, int>(
-                "OnAttendeeCheckedIn_" + sessionId, cancellationToken);
-    }
+       public async ValueTask<ISourceStream<int>> SubscribeToOnAttendeeCheckedInAsync(
+           int sessionId,
+           [Service] ITopicEventReceiver eventReceiver,
+           CancellationToken cancellationToken) =>
+           await eventReceiver.SubscribeAsync<string, int>(
+               "OnAttendeeCheckedIn_" + sessionId, cancellationToken);
+   }
    ```
 
    `OnAttendeeCheckedIn` represents our resolver like in the first subscription we built, but now in our `SubscribeAttribute` we are referring to a method called `SubscribeToOnAttendeeCheckedInAsync`. So, instead of letting the system generate a subscribe resolver that handles subscribing to the pub/sub-system we are creating it ourselves in order to control how it is done or event order to filter out events that we do not want to pass down.

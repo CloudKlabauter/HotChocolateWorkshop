@@ -54,12 +54,12 @@
 
    public class ApplicationDbContext : DbContext
    {
-      public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-         : base(options)
-      {
-      }
+       public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+           : base(options)
+       {
+       }
 
-      public DbSet<Speaker> Speakers { get; set; }
+       public DbSet<Speaker> Speakers { get; set; }
    }
    ```
 
@@ -68,17 +68,17 @@
 1. Replace the code in `Programm.cs` with the following code:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
-    using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using Microsoft.EntityFrameworkCore;
 
-    var builder = WebApplication.CreateBuilder(args);
-    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=conferences.db"));
+   var builder = WebApplication.CreateBuilder(args);
+   builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=conferences.db"));
 
-    var app = builder.Build();
+   var app = builder.Build();
 
-    app.UseRouting();
+   app.UseRouting();
 
-    app.Run();
+   app.Run();
    ```
 
    > This code registers the `ApplicationDbContext` service so it can be injected into resolvers.
@@ -140,8 +140,8 @@ Commands Explained
 
    public class Query
    {
-      public IQueryable<Speaker> GetSpeakers([Service] ApplicationDbContext context) =>
-         context.Speakers;
+       public IQueryable<Speaker> GetSpeakers([Service] ApplicationDbContext context) =>
+           context.Speakers;
    }
    ```
 
@@ -149,8 +149,8 @@ Commands Explained
 
    ```csharp
    builder.Services
-    .AddGraphQLServer()
-    .AddQueryType<Query>();
+       .AddGraphQLServer()
+       .AddQueryType<Query>();
    ```
 
    > The above code registers a GraphQL schema with our dependency injection and with that registers our `Query` type.
@@ -164,23 +164,22 @@ Commands Explained
    > Your `Programm.cs` should now look like the following:
 
    ```csharp
-    using ConferencePlanner.GraphQL;
-    using ConferencePlanner.GraphQL.Data;
-    using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL;
+   using ConferencePlanner.GraphQL.Data;
+   using Microsoft.EntityFrameworkCore;
 
-    var builder = WebApplication.CreateBuilder(args);
-    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=conferences.db"));
+   var builder = WebApplication.CreateBuilder(args);
+   builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=conferences.db"));
 
-    builder.Services
-        .AddGraphQLServer()
-        .AddQueryType<Query>();
+   builder.Services
+       .AddGraphQLServer()
+       .AddQueryType<Query>();
 
-    var app = builder.Build();
+   var app = builder.Build();
 
-    app.UseRouting();
-    app.MapGraphQL();
+   app.MapGraphQL();
 
-    app.Run();
+   app.Run();
    ```
 
 1. Start the server.
@@ -246,12 +245,12 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
 
    public class AddSpeakerPayload
    {
-      public AddSpeakerPayload(Speaker speaker)
-      {
-         Speaker = speaker;
-      }
+       public AddSpeakerPayload(Speaker speaker)
+       {
+           Speaker = speaker;
+       }
 
-      public Speaker Speaker { get; }
+       public Speaker Speaker { get; }
    }
    ```
 
@@ -264,22 +263,22 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
 
    public class Mutation
    {
-      public async Task<AddSpeakerPayload> AddSpeakerAsync(
-         AddSpeakerInput input,
-         [Service] ApplicationDbContext context)
-      {
-         var speaker = new Speaker
-         {
+       public async Task<AddSpeakerPayload> AddSpeakerAsync(
+           AddSpeakerInput input,
+           [Service] ApplicationDbContext context)
+       {
+           var speaker = new Speaker
+           {
                Name = input.Name,
                Bio = input.Bio,
                WebSite = input.WebSite
-         };
+           };
 
-         context.Speakers.Add(speaker);
-         await context.SaveChangesAsync();
+           context.Speakers.Add(speaker);
+           await context.SaveChangesAsync();
 
-         return new AddSpeakerPayload(speaker);
-      }
+           return new AddSpeakerPayload(speaker);
+       }
    }
    ```
 
@@ -287,9 +286,9 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
 
    ```csharp
    builder.Services
-        .AddGraphQLServer()
-        .AddQueryType<Query>()
-        .AddMutationType<Mutation>();
+       .AddGraphQLServer()
+       .AddQueryType<Query>()
+       .AddMutationType<Mutation>();
    ```
 
 1. Start the server again in order to validate if it is working properly.
@@ -352,17 +351,17 @@ The GraphQL type system distinguishes between nullable and non-nullable types. T
 
    public class Speaker
    {
-      public int Id { get; set; }
+       public int Id { get; set; }
 
-      [Required]
-      [StringLength(200)]
-      public string? Name { get; set; }
+       [Required]
+       [StringLength(200)]
+       public string? Name { get; set; }
 
-      [StringLength(4000)]
-      public string? Bio { get; set; }
+       [StringLength(4000)]
+       public string? Bio { get; set; }
 
-      [StringLength(1000)]
-      public virtual string? WebSite { get; set; }
+       [StringLength(1000)]
+       public virtual string? WebSite { get; set; }
    }
    ```
 
@@ -373,9 +372,9 @@ The GraphQL type system distinguishes between nullable and non-nullable types. T
 
    public class AddSpeakerInput
    {
-      public string Name { get; set; } = default!;
-      public string? Bio { get; set; }
-      public string? WebSite { get; set; }
+       public string Name { get; set; } = default!;
+       public string? Bio { get; set; }
+       public string? WebSite { get; set; }
    }
    ```
 

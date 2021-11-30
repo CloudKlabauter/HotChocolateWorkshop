@@ -29,36 +29,36 @@ First, we will restructure our GraphQL server so that it will better scale once 
 1. Create a class `Payload.cs` in the `Common` directory with the following code:
 
    ```csharp
-    namespace ConferencePlanner.GraphQL.Common;
+   namespace ConferencePlanner.GraphQL.Common;
 
-    public abstract class Payload
-    {
-        protected Payload(IReadOnlyList<UserError>? errors = null)
-        {
-            Errors = errors;
-        }
+   public abstract class Payload
+   {
+       protected Payload(IReadOnlyList<UserError>? errors = null)
+       {
+           Errors = errors;
+       }
 
-        public IReadOnlyList<UserError>? Errors { get; }
-    }
+       public IReadOnlyList<UserError>? Errors { get; }
+   }
    ```
 
 1. Next, we create a new class `UserError` that is also located in the `Common` directory with the following code:
 
    ```csharp
-    namespace ConferencePlanner.GraphQL.Common;
+   namespace ConferencePlanner.GraphQL.Common;
 
-    public class UserError
-    {
-        public UserError(string message, string code)
-        {
-            Message = message;
-            Code = code;
-        }
+   public class UserError
+   {
+       public UserError(string message, string code)
+       {
+           Message = message;
+           Code = code;
+       }
 
-        public string Message { get; }
+       public string Message { get; }
 
-        public string Code { get; }
-    }
+       public string Code { get; }
+   }
    ```
 
 Now, that we have some base classes for our mutation let us start to reorganize the mutation type.
@@ -74,88 +74,88 @@ Now, that we have some base classes for our mutation let us start to reorganize 
 1. Now, annotate the renamed class with the `ExtendObjectTypeAttribute.` The class should look like this now:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Speakers;
+   namespace ConferencePlanner.GraphQL.Speakers;
 
-    [ExtendObjectType("Mutation")]
-    public class SpeakerMutations
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<AddSpeakerPayload> AddSpeakerAsync(
-            AddSpeakerInput input,
-            [ScopedService] ApplicationDbContext context)
-        {
-            var speaker = new Speaker
-            {
-                Name = input.Name,
-                Bio = input.Bio,
-                WebSite = input.WebSite
-            };
+   [ExtendObjectType("Mutation")]
+   public class SpeakerMutations
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<AddSpeakerPayload> AddSpeakerAsync(
+           AddSpeakerInput input,
+           [ScopedService] ApplicationDbContext context)
+       {
+           var speaker = new Speaker
+           {
+               Name = input.Name,
+               Bio = input.Bio,
+               WebSite = input.WebSite
+           };
 
-            context.Speakers.Add(speaker);
-            await context.SaveChangesAsync();
+           context.Speakers.Add(speaker);
+           await context.SaveChangesAsync();
 
-            return new AddSpeakerPayload(speaker);
-        }
-    }
+           return new AddSpeakerPayload(speaker);
+       }
+   }
    ```
 
 1. Move the `AddSpeakerInput.cs` into the `Speakers` directory.
 
    ```csharp
-    namespace ConferencePlanner.GraphQL.Speakers;
+   namespace ConferencePlanner.GraphQL.Speakers;
 
-    public record AddSpeakerInput(
-        string Name,
-        string? Bio,
-        string? WebSite);
+   public record AddSpeakerInput(
+       string Name,
+       string? Bio,
+       string? WebSite);
    ```
 
 1. Next, create a new class `SpeakerPayloadBase.cs` with the following code:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Common;
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Common;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Speakers;
+   namespace ConferencePlanner.GraphQL.Speakers;
 
-    public class SpeakerPayloadBase : Payload
-    {
-        protected SpeakerPayloadBase(Speaker speaker)
-        {
-            Speaker = speaker;
-        }
+   public class SpeakerPayloadBase : Payload
+   {
+       protected SpeakerPayloadBase(Speaker speaker)
+       {
+           Speaker = speaker;
+       }
 
-        protected SpeakerPayloadBase(IReadOnlyList<UserError> errors)
-            : base(errors)
-        {
-        }
+       protected SpeakerPayloadBase(IReadOnlyList<UserError> errors)
+           : base(errors)
+       {
+       }
 
-        public Speaker? Speaker { get; }
-    }
+       public Speaker? Speaker { get; }
+   }
    ```
 
 1. Now, move the `AddSpeakerPayload.cs` and base it on the new `SpeakerPayloadBase`. The code should now look like the following:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Common;
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Common;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Speakers;
+   namespace ConferencePlanner.GraphQL.Speakers;
 
-    public class AddSpeakerPayload : SpeakerPayloadBase
-    {
-        public AddSpeakerPayload(Speaker speaker)
-            : base(speaker)
-        {
-        }
+   public class AddSpeakerPayload : SpeakerPayloadBase
+   {
+       public AddSpeakerPayload(Speaker speaker)
+           : base(speaker)
+       {
+       }
 
-        public AddSpeakerPayload(IReadOnlyList<UserError> errors)
-            : base(errors)
-        {
-        }
-    }
+       public AddSpeakerPayload(IReadOnlyList<UserError> errors)
+           : base(errors)
+       {
+       }
+   }
    ```
 
 1. Change the schema configurations so that we can merge the various `Mutation` class that we will have into one. For that replace the schema builder configuration with the following code in the `Program.cs`:
@@ -192,46 +192,46 @@ Now that we have reorganized our mutations, we will refactor the schema to a pro
 1. Configure the speaker entity to implement the `Node` interface by adding the node configuration to the `SpeakerType.cs`.
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Types;
+   namespace ConferencePlanner.GraphQL.Types;
 
-    public class SpeakerType : ObjectType<Speaker>
-    {
-        protected override void Configure(IObjectTypeDescriptor<Speaker> descriptor)
-        {
-            descriptor
-                .ImplementsNode()
-                .IdField(t => t.Id)
-                .ResolveNode((ctx, id) => ctx.DataLoader<SpeakerByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
+   public class SpeakerType : ObjectType<Speaker>
+   {
+       protected override void Configure(IObjectTypeDescriptor<Speaker> descriptor)
+       {
+           descriptor
+               .ImplementsNode()
+               .IdField(t => t.Id)
+               .ResolveNode((ctx, id) => ctx.DataLoader<SpeakerByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
 
-            descriptor
-                .Field(t => t.SessionSpeakers)
-                .ResolveWith<SpeakerResolvers>(t => t.GetSessionsAsync(default!, default!, default!, default))
-                .UseDbContext<ApplicationDbContext>()
-                .Name("sessions");
-        }
+           descriptor
+               .Field(t => t.SessionSpeakers)
+               .ResolveWith<SpeakerResolvers>(t => t.GetSessionsAsync(default!, default!, default!, default))
+               .UseDbContext<ApplicationDbContext>()
+               .Name("sessions");
+       }
 
-        private class SpeakerResolvers
-        {
-            public async Task<IEnumerable<Session>> GetSessionsAsync(
-                Speaker speaker,
-                [ScopedService] ApplicationDbContext dbContext,
-                SessionByIdDataLoader sessionById,
-                CancellationToken cancellationToken)
-            {
-                int[] speakerIds = await dbContext.Speakers
-                    .Where(s => s.Id == speaker.Id)
-                    .Include(s => s.SessionSpeakers)
-                    .SelectMany(s => s.SessionSpeakers.Select(t => t.SessionId))
-                    .ToArrayAsync();
+       private class SpeakerResolvers
+       {
+           public async Task<IEnumerable<Session>> GetSessionsAsync(
+               Speaker speaker,
+               [ScopedService] ApplicationDbContext dbContext,
+               SessionByIdDataLoader sessionById,
+               CancellationToken cancellationToken)
+           {
+               int[] speakerIds = await dbContext.Speakers
+                   .Where(s => s.Id == speaker.Id)
+                   .Include(s => s.SessionSpeakers)
+                   .SelectMany(s => s.SessionSpeakers.Select(t => t.SessionId))
+                   .ToArrayAsync();
 
-                return await sessionById.LoadAsync(speakerIds, cancellationToken);
-            }
-        }
-    }
+               return await sessionById.LoadAsync(speakerIds, cancellationToken);
+           }
+       }
+   }
    ```
 
    > The following piece of code marked our `SpeakerType.cs` as implementing the `Node` interface. It also defined that the `id` field that the node interface specifies is implemented by the `Id` on our entity. The internal `Id` is consequently rewritten to a global object identifier that contains the internal id plus the type name. Last but not least we defined a `ResolveNode` that is able to load the entity by `id`.
@@ -281,71 +281,71 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
    `AttendeeByIdDataLoader.cs`
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.DataLoader;
+   namespace ConferencePlanner.GraphQL.DataLoader;
 
-    public class AttendeeByIdDataLoader : BatchDataLoader<int, Attendee>
-    {
-        private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
+   public class AttendeeByIdDataLoader : BatchDataLoader<int, Attendee>
+   {
+       private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
 
-        public AttendeeByIdDataLoader(
-            IBatchScheduler batchScheduler,
-            IDbContextFactory<ApplicationDbContext> dbContextFactory)
-            : base(batchScheduler)
-        {
-            _dbContextFactory = dbContextFactory ??
-                throw new ArgumentNullException(nameof(dbContextFactory));
-        }
+       public AttendeeByIdDataLoader(
+           IBatchScheduler batchScheduler,
+           IDbContextFactory<ApplicationDbContext> dbContextFactory)
+           : base(batchScheduler)
+       {
+           _dbContextFactory = dbContextFactory ??
+               throw new ArgumentNullException(nameof(dbContextFactory));
+       }
 
-        protected override async Task<IReadOnlyDictionary<int, Attendee>> LoadBatchAsync(
-            IReadOnlyList<int> keys,
-            CancellationToken cancellationToken)
-        {
-            await using ApplicationDbContext dbContext =
-                _dbContextFactory.CreateDbContext();
+       protected override async Task<IReadOnlyDictionary<int, Attendee>> LoadBatchAsync(
+           IReadOnlyList<int> keys,
+           CancellationToken cancellationToken)
+       {
+           await using ApplicationDbContext dbContext =
+               _dbContextFactory.CreateDbContext();
 
-            return await dbContext.Attendees
-                .Where(s => keys.Contains(s.Id))
-                .ToDictionaryAsync(t => t.Id, cancellationToken);
-        }
-    }
+           return await dbContext.Attendees
+               .Where(s => keys.Contains(s.Id))
+               .ToDictionaryAsync(t => t.Id, cancellationToken);
+       }
+   }
    ```
 
    `TrackByIdDataLoader.cs`
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.DataLoader;
+   namespace ConferencePlanner.GraphQL.DataLoader;
 
-    public class TrackByIdDataLoader : BatchDataLoader<int, Track>
-    {
-        private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
+   public class TrackByIdDataLoader : BatchDataLoader<int, Track>
+   {
+       private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
 
-        public TrackByIdDataLoader(
-            IBatchScheduler batchScheduler,
-            IDbContextFactory<ApplicationDbContext> dbContextFactory)
-            : base(batchScheduler)
-        {
-            _dbContextFactory = dbContextFactory ??
-                throw new ArgumentNullException(nameof(dbContextFactory));
-        }
+       public TrackByIdDataLoader(
+           IBatchScheduler batchScheduler,
+           IDbContextFactory<ApplicationDbContext> dbContextFactory)
+           : base(batchScheduler)
+       {
+           _dbContextFactory = dbContextFactory ??
+               throw new ArgumentNullException(nameof(dbContextFactory));
+       }
 
-        protected override async Task<IReadOnlyDictionary<int, Track>> LoadBatchAsync(
-            IReadOnlyList<int> keys,
-            CancellationToken cancellationToken)
-        {
-            await using ApplicationDbContext dbContext =
-                _dbContextFactory.CreateDbContext();
+       protected override async Task<IReadOnlyDictionary<int, Track>> LoadBatchAsync(
+           IReadOnlyList<int> keys,
+           CancellationToken cancellationToken)
+       {
+           await using ApplicationDbContext dbContext =
+               _dbContextFactory.CreateDbContext();
 
-            return await dbContext.Tracks
-                .Where(s => keys.Contains(s.Id))
-                .ToDictionaryAsync(t => t.Id, cancellationToken);
-        }
-    }
+           return await dbContext.Tracks
+               .Where(s => keys.Contains(s.Id))
+               .ToDictionaryAsync(t => t.Id, cancellationToken);
+       }
+   }
    ```
 
 1. Now, copy the missing type classes, `AttendeeType.cs`, `TrackType.cs`, and `SessionType.cs` from `./code/Types` to the `Types` directory.
@@ -355,25 +355,25 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
 1. Next, add the `[ExtendObjectType("Query")]` on top of our `SpeakerQueries` class. The code should now look like the following.
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Speakers;
+   namespace ConferencePlanner.GraphQL.Speakers;
 
-    [ExtendObjectType("Query")]
-    public class SpeakerQueries
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
-            context.Speakers.ToListAsync();
+   [ExtendObjectType("Query")]
+   public class SpeakerQueries
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
+           context.Speakers.ToListAsync();
 
-        public Task<Speaker> GetSpeakerAsync(
-            [ID(nameof(Speaker))]int id,
-            SpeakerByIdDataLoader dataLoader,
-            CancellationToken cancellationToken) =>
-            dataLoader.LoadAsync(id, cancellationToken);
-    }
+       public Task<Speaker> GetSpeakerAsync(
+           [ID(nameof(Speaker))]int id,
+           SpeakerByIdDataLoader dataLoader,
+           CancellationToken cancellationToken) =>
+           dataLoader.LoadAsync(id, cancellationToken);
+   }
    ```
 
 1. Head over to the `Program.cs` and lets reconfigure the schema builder like we did with the `Mutation` type. The new schema configuration should look like the following:
@@ -459,33 +459,33 @@ mkdir ConferencePlanner.GraphQL/Sessions
 1. Now, insert the following `scheduleSession` mutation to the `SessionMutations` class:
 
    ```csharp
-    [UseDbContext(typeof(ApplicationDbContext))]
-    public async Task<ScheduleSessionPayload> ScheduleSessionAsync(
+   [UseDbContext(typeof(ApplicationDbContext))]
+   public async Task<ScheduleSessionPayload> ScheduleSessionAsync(
        ScheduleSessionInput input,
        [ScopedService] ApplicationDbContext context)
-    {
-        if (input.EndTime < input.StartTime)
-        {
-            return new ScheduleSessionPayload(
-                new UserError("endTime has to be larger than startTime.", "END_TIME_INVALID"));
-        }
+   {
+       if (input.EndTime < input.StartTime)
+       {
+           return new ScheduleSessionPayload(
+               new UserError("endTime has to be larger than startTime.", "END_TIME_INVALID"));
+       }
 
-        Session? session = await context.Sessions.FindAsync(input.SessionId);
+       Session? session = await context.Sessions.FindAsync(input.SessionId);
 
-        if (session is null)
-        {
-            return new ScheduleSessionPayload(
-                new UserError("Session not found.", "SESSION_NOT_FOUND"));
-        }
+       if (session is null)
+       {
+           return new ScheduleSessionPayload(
+               new UserError("Session not found.", "SESSION_NOT_FOUND"));
+       }
 
-        session.TrackId = input.TrackId;
-        session.StartTime = input.StartTime;
-        session.EndTime = input.EndTime;
+       session.TrackId = input.TrackId;
+       session.StartTime = input.StartTime;
+       session.EndTime = input.EndTime;
 
-        await context.SaveChangesAsync();
+       await context.SaveChangesAsync();
 
-        return new ScheduleSessionPayload(session);
-    }
+       return new ScheduleSessionPayload(session);
+   }
    ```
 
    While we now are able to add sessions and then schedule them, we still need some mutations to create a track or rename a track.
@@ -501,27 +501,27 @@ mkdir ConferencePlanner.GraphQL/Sessions
 1. Now that you have the payload and input files in create a new class `TracksMutations.cs` with the following code:
 
    ```csharp
-    using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.Data;
 
-    namespace ConferencePlanner.GraphQL.Tracks;
+   namespace ConferencePlanner.GraphQL.Tracks;
 
-    [ExtendObjectType("Mutation")]
-    public class TrackMutations
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<AddTrackPayload> AddTrackAsync(
-            AddTrackInput input,
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken)
-        {
-            var track = new Track { Name = input.Name };
-            context.Tracks.Add(track);
+   [ExtendObjectType("Mutation")]
+   public class TrackMutations
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<AddTrackPayload> AddTrackAsync(
+           AddTrackInput input,
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken)
+       {
+           var track = new Track { Name = input.Name };
+           context.Tracks.Add(track);
 
-            await context.SaveChangesAsync(cancellationToken);
+           await context.SaveChangesAsync(cancellationToken);
 
-            return new AddTrackPayload(track);
-        }
-    }
+           return new AddTrackPayload(track);
+       }
+   }
    ```
 
 1. Head back to the `Programm.cs` and add the `TrackMutations` to the schema builder.
@@ -550,25 +550,25 @@ mkdir ConferencePlanner.GraphQL/Sessions
 
    ```csharp
    [UseDbContext(typeof(ApplicationDbContext))]
-    public async Task<RenameTrackPayload> RenameTrackAsync(
-      RenameTrackInput input,
-      [ScopedService] ApplicationDbContext context,
-      CancellationToken cancellationToken)
-    {
-        Track? track = await context.Tracks.FindAsync(input.Id);
+   public async Task<RenameTrackPayload> RenameTrackAsync(
+       RenameTrackInput input,
+       [ScopedService] ApplicationDbContext context,
+       CancellationToken cancellationToken)
+   {
+       Track? track = await context.Tracks.FindAsync(input.Id);
 
-        if (track is null)
-        {
-            return new RenameTrackPayload(
-                new UserError("Track not found.", "TRACK_NOT_FOUND"));
-        }
+       if (track is null)
+       {
+           return new RenameTrackPayload(
+               new UserError("Track not found.", "TRACK_NOT_FOUND"));
+       }
 
-        track.Name = input.Name;
+       track.Name = input.Name;
 
-        await context.SaveChangesAsync(cancellationToken);
+       await context.SaveChangesAsync(cancellationToken);
 
-        return new RenameTrackPayload(track);
-    }
+       return new RenameTrackPayload(track);
+   }
    ```
 
 1. Start your GraphQL server and verify that your `Mutations` work by adding some sessions, creating tracks and scheduling the sessions to the tracks.
@@ -605,26 +605,26 @@ In this section, we will optimize our `Query` type by bringing in more fields to
 1. Head over to your `SpeakerQueries` class and update the `speaker` field to be named `speakerById`.
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Speakers;
+   namespace ConferencePlanner.GraphQL.Speakers;
 
-    [ExtendObjectType("Query")]
-    public class SpeakerQueries
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public Task<List<Speaker>> GetSpeakersAsync(
-            [ScopedService] ApplicationDbContext context) =>
-            context.Speakers.ToListAsync();
+   [ExtendObjectType("Query")]
+   public class SpeakerQueries
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public Task<List<Speaker>> GetSpeakersAsync(
+           [ScopedService] ApplicationDbContext context) =>
+           context.Speakers.ToListAsync();
 
-        public Task<Speaker> GetSpeakerByIdAsync(
-            [ID(nameof(Speaker))]int id,
-            SpeakerByIdDataLoader dataLoader,
-            CancellationToken cancellationToken) =>
-            dataLoader.LoadAsync(id, cancellationToken);
-    }
+       public Task<Speaker> GetSpeakerByIdAsync(
+           [ID(nameof(Speaker))]int id,
+           SpeakerByIdDataLoader dataLoader,
+           CancellationToken cancellationToken) =>
+           dataLoader.LoadAsync(id, cancellationToken);
+   }
    ```
 
 1. Next, introduce a new `GetSpeakersByIdAsync` method as our plural version.
@@ -632,149 +632,149 @@ In this section, we will optimize our `Query` type by bringing in more fields to
    > Note that the `DataLoader` can also fetch multiples for us.
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Speakers;
+   namespace ConferencePlanner.GraphQL.Speakers;
 
-    [ExtendObjectType("Query")]
-    public class SpeakerQueries
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public Task<List<Speaker>> GetSpeakersAsync(
-            [ScopedService] ApplicationDbContext context) =>
-            context.Speakers.ToListAsync();
+   [ExtendObjectType("Query")]
+   public class SpeakerQueries
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public Task<List<Speaker>> GetSpeakersAsync(
+           [ScopedService] ApplicationDbContext context) =>
+           context.Speakers.ToListAsync();
 
-        public Task<Speaker> GetSpeakerByIdAsync(
-            [ID(nameof(Speaker))]int id,
-            SpeakerByIdDataLoader dataLoader,
-            CancellationToken cancellationToken) =>
-            dataLoader.LoadAsync(id, cancellationToken);
+       public Task<Speaker> GetSpeakerByIdAsync(
+           [ID(nameof(Speaker))] int id,
+           SpeakerByIdDataLoader dataLoader,
+           CancellationToken cancellationToken) =>
+           dataLoader.LoadAsync(id, cancellationToken);
 
-        public async Task<IEnumerable<Speaker>> GetSpeakersByIdAsync(
-            [ID(nameof(Speaker))]int[] ids,
-            SpeakerByIdDataLoader dataLoader,
-            CancellationToken cancellationToken) =>
-            await dataLoader.LoadAsync(ids, cancellationToken);
-    }
+       public async Task<IEnumerable<Speaker>> GetSpeakersByIdAsync(
+           [ID(nameof(Speaker))] int[] ids,
+           SpeakerByIdDataLoader dataLoader,
+           CancellationToken cancellationToken) =>
+           await dataLoader.LoadAsync(ids, cancellationToken);
+   }
    ```
 
 1. Add a new class `SessionQueries.cs` to the `Sessions` directory with the following code:
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Sessions;
+   namespace ConferencePlanner.GraphQL.Sessions;
 
-    [ExtendObjectType("Query")]
-    public class SessionQueries
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<IEnumerable<Session>> GetSessionsAsync(
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken) =>
-            await context.Sessions.ToListAsync(cancellationToken);
+   [ExtendObjectType("Query")]
+   public class SessionQueries
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<IEnumerable<Session>> GetSessionsAsync(
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken) =>
+           await context.Sessions.ToListAsync(cancellationToken);
 
-        public Task<Session> GetSessionByIdAsync(
-            [ID(nameof(Session))] int id,
-            SessionByIdDataLoader sessionById,
-            CancellationToken cancellationToken) =>
-            sessionById.LoadAsync(id, cancellationToken);
+       public Task<Session> GetSessionByIdAsync(
+           [ID(nameof(Session))] int id,
+           SessionByIdDataLoader sessionById,
+           CancellationToken cancellationToken) =>
+           sessionById.LoadAsync(id, cancellationToken);
 
-        public async Task<IEnumerable<Session>> GetSessionsByIdAsync(
-            [ID(nameof(Session))] int[] ids,
-            SessionByIdDataLoader sessionById,
-            CancellationToken cancellationToken) =>
-            await sessionById.LoadAsync(ids, cancellationToken);
-    }
+       public async Task<IEnumerable<Session>> GetSessionsByIdAsync(
+           [ID(nameof(Session))] int[] ids,
+           SessionByIdDataLoader sessionById,
+           CancellationToken cancellationToken) =>
+           await sessionById.LoadAsync(ids, cancellationToken);
+   }
    ```
 
 1. Register the `SessionQueries` with the schema builder which is located in the `Program.cs`
 
    ```csharp
    builder.Services
-        .AddGraphQLServer()
-        .AddQueryType(d => d.Name("Query"))
-            .AddTypeExtension<SessionQueries>()
-            .AddTypeExtension<SpeakerQueries>()
-        .AddMutationType(d => d.Name("Mutation"))
-            .AddTypeExtension<SessionMutations>()
-            .AddTypeExtension<SpeakerMutations>()
-            .AddTypeExtension<TrackMutations>()
-        .AddType<AttendeeType>()
-        .AddType<SessionType>()
-        .AddType<SpeakerType>()
-        .AddType<TrackType>()
-        .AddGlobalObjectIdentification();
+       .AddGraphQLServer()
+       .AddQueryType(d => d.Name("Query"))
+           .AddTypeExtension<SessionQueries>()
+           .AddTypeExtension<SpeakerQueries>()
+       .AddMutationType(d => d.Name("Mutation"))
+           .AddTypeExtension<SessionMutations>()
+           .AddTypeExtension<SpeakerMutations>()
+           .AddTypeExtension<TrackMutations>()
+       .AddType<AttendeeType>()
+       .AddType<SessionType>()
+       .AddType<SpeakerType>()
+       .AddType<TrackType>()
+       .AddGlobalObjectIdentification();
    ```
 
 1. Next add a class `TrackQueries.cs` to the `Tracks` directory with the following code:
 
    ```csharp
-    using Microsoft.EntityFrameworkCore;
-    using ConferencePlanner.GraphQL.Data;
-    using ConferencePlanner.GraphQL.DataLoader;
+   using Microsoft.EntityFrameworkCore;
+   using ConferencePlanner.GraphQL.Data;
+   using ConferencePlanner.GraphQL.DataLoader;
 
-    namespace ConferencePlanner.GraphQL.Tracks;
+   namespace ConferencePlanner.GraphQL.Tracks;
 
-    [ExtendObjectType("Query")]
-    public class TrackQueries
-    {
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<IEnumerable<Track>> GetTracksAsync(
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken) =>
-            await context.Tracks.ToListAsync(cancellationToken);
+   [ExtendObjectType("Query")]
+   public class TrackQueries
+   {
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<IEnumerable<Track>> GetTracksAsync(
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken) =>
+           await context.Tracks.ToListAsync(cancellationToken);
 
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public Task<Track> GetTrackByNameAsync(
-            string name,
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken) =>
-            context.Tracks.FirstAsync(t => t.Name == name);
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public Task<Track> GetTrackByNameAsync(
+           string name,
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken) =>
+           context.Tracks.FirstAsync(t => t.Name == name);
 
-        [UseDbContext(typeof(ApplicationDbContext))]
-        public async Task<IEnumerable<Track>> GetTrackByNamesAsync(
-            string[] names,
-            [ScopedService] ApplicationDbContext context,
-            CancellationToken cancellationToken) =>
-            await context.Tracks.Where(t => names.Contains(t.Name)).ToListAsync();
+       [UseDbContext(typeof(ApplicationDbContext))]
+       public async Task<IEnumerable<Track>> GetTrackByNamesAsync(
+           string[] names,
+           [ScopedService] ApplicationDbContext context,
+           CancellationToken cancellationToken) =>
+           await context.Tracks.Where(t => names.Contains(t.Name)).ToListAsync();
 
-        public Task<Track> GetTrackByIdAsync(
-            [ID(nameof(Track))] int id,
-            TrackByIdDataLoader trackById,
-            CancellationToken cancellationToken) =>
-            trackById.LoadAsync(id, cancellationToken);
+       public Task<Track> GetTrackByIdAsync(
+           [ID(nameof(Track))] int id,
+           TrackByIdDataLoader trackById,
+           CancellationToken cancellationToken) =>
+           trackById.LoadAsync(id, cancellationToken);
 
-        public async Task<IEnumerable<Track>> GetTracksByIdAsync(
-            [ID(nameof(Track))] int[] ids,
-            TrackByIdDataLoader trackById,
-            CancellationToken cancellationToken) =>
-            await trackById.LoadAsync(ids, cancellationToken);
-    }
+       public async Task<IEnumerable<Track>> GetTracksByIdAsync(
+           [ID(nameof(Track))] int[] ids,
+           TrackByIdDataLoader trackById,
+           CancellationToken cancellationToken) =>
+           await trackById.LoadAsync(ids, cancellationToken);
+   }
    ```
 
 1. Again, head over to the `Program.cs` and register the `TrackQueries` with the schema builder.
 
    ```csharp
    builder.Services
-        .AddGraphQLServer()
-        .AddQueryType(d => d.Name("Query"))
-            .AddTypeExtension<SessionQueries>()
-            .AddTypeExtension<SpeakerQueries>()
-            .AddTypeExtension<TrackQueries>()
-        .AddMutationType(d => d.Name("Mutation"))
-            .AddTypeExtension<SessionMutations>()
-            .AddTypeExtension<SpeakerMutations>()
-            .AddTypeExtension<TrackMutations>()
-        .AddType<AttendeeType>()
-        .AddType<SessionType>()
-        .AddType<SpeakerType>()
-        .AddType<TrackType>()
-        .AddGlobalObjectIdentification();
+       .AddGraphQLServer()
+       .AddQueryType(d => d.Name("Query"))
+           .AddTypeExtension<SessionQueries>()
+           .AddTypeExtension<SpeakerQueries>()
+           .AddTypeExtension<TrackQueries>()
+       .AddMutationType(d => d.Name("Mutation"))
+           .AddTypeExtension<SessionMutations>()
+           .AddTypeExtension<SpeakerMutations>()
+           .AddTypeExtension<TrackMutations>()
+       .AddType<AttendeeType>()
+       .AddType<SessionType>()
+       .AddType<SpeakerType>()
+       .AddType<TrackType>()
+       .AddGlobalObjectIdentification();
    ```
 
 1. Start you GraphQL server and verify with Banana Cake Pop that you can use the new queries.
