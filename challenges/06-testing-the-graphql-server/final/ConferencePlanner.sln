@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConferencePlanner.GraphQL", "ConferencePlanner.GraphQL\ConferencePlanner.GraphQL.csproj", "{488F821E-F63F-4A70-83C6-F29CB8451187}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConferencePlanner.GraphQL.Tests", "ConferencePlanner.GraphQL.Tests\ConferencePlanner.GraphQL.Tests.csproj", "{1AFECC16-8E60-45EC-B525-EC19DA4B07E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{488F821E-F63F-4A70-83C6-F29CB8451187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{488F821E-F63F-4A70-83C6-F29CB8451187}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{488F821E-F63F-4A70-83C6-F29CB8451187}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{488F821E-F63F-4A70-83C6-F29CB8451187}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AFECC16-8E60-45EC-B525-EC19DA4B07E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AFECC16-8E60-45EC-B525-EC19DA4B07E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AFECC16-8E60-45EC-B525-EC19DA4B07E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AFECC16-8E60-45EC-B525-EC19DA4B07E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddPooledDbContextFactory<ApplicationDbContext>(options => options.UseSqlite("Data Source=conferences.db"));
 
-
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
@@ -17,8 +16,6 @@ builder.Services
     .AddDataLoader<SessionByIdDataLoader>();
 
 var app = builder.Build();
-
-//app.MapGet("/", () => "Hello World!");
 
 app.UseRouting();
 app.MapGraphQL();

@@ -1,6 +1,8 @@
-namespace ConferencePlanner.GraphQL.Speakers;
+namespace ConferencePlanner.GraphQL;
 
-public record AddSpeakerInput(
-    string Name,
-    string? Bio,
-    string? WebSite);
+public class AddSpeakerInput
+{
+    public string Name { get; set; } = default!;
+    public string? Bio { get; set; }
+    public string? WebSite { get; set; }
+}

@@ -199,6 +199,19 @@ Commands Explained
 
    ![Explore GraphQL schema with Banana Cake Pop](../../images/3-bcp-schema-explorer.png)
 
+1. With this query you can load all speakers and the fields **_id_**, **_name_**, **_bio_** and **_webSite_** will be returned. Since there are currently no speakers in the database, you will get an empty list.
+
+   ```graphql
+   query {
+     speakers {
+       id
+       name
+       bio
+       webSite
+     }
+   }
+   ```
+
 ## Adding Mutations
 
 So, far we have added the Query root type to our schema, which allows us to query speakers. However, at this point, there is no way to add or modify any data. In this section, we are going to add the root Mutation type to add new speakers to our database.
@@ -214,10 +227,12 @@ So, for our `addSpeaker` mutation, we create two types: `AddSpeakerInput` and `A
    ```csharp
    namespace ConferencePlanner.GraphQL;
 
-   public record AddSpeakerInput(
-      string Name,
-      string Bio,
-      string WebSite);
+   public class AddSpeakerInput
+   {
+      public string Name { get; set; }
+      public string Bio { get; set; }
+      public string WebSite { get; set; }
+   }
    ```
 
    > The input and output (payload) both contain a client mutation identifier used to reconcile requests and responses in some client frameworks.
@@ -356,10 +371,12 @@ The GraphQL type system distinguishes between nullable and non-nullable types. T
    ```csharp
    namespace ConferencePlanner.GraphQL;
 
-   public record AddSpeakerInput(
-      string Name,
-      string? Bio,
-      string? WebSite);
+   public class AddSpeakerInput
+   {
+      public string Name { get; set; } = default!;
+      public string? Bio { get; set; }
+      public string? WebSite { get; set; }
+   }
    ```
 
    > The payload type can stay for now as it is.

@@ -15,6 +15,9 @@
 
 .vscode/
 
+/challenges/*/*/*.db-shm
+/challenges/*/*/*.db-wal
+
 # Mono auto generated files
 mono_crash.*
 
