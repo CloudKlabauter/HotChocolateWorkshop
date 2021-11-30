@@ -17,7 +17,7 @@
 
 *.db-shm
 *.db-wal
-*/ConferencePlanner.GraphQL/conferences.db
+challenges/*/*/ConferencePlanner.GraphQL/conferences.db
 
 # Mono auto generated files
 mono_crash.*
