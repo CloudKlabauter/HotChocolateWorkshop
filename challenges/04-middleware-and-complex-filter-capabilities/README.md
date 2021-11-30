@@ -58,24 +58,31 @@ After `next` has finished executing, the middleware checks if the result is a `s
 
 ## Add UseUpper middleware
 
-1. Head over to the `ObjectFieldDescriptorExtensions` class located in the `Extensions` folder.
+1. Create a `Extensions` folder in your `ConferencePlanner.GraphQL` project.
 
-1. Add the `UseUpperCase` extension method to the `ObjectFieldDescriptorExtensions` class.
+   1. `mkdir ConferencePlanner.GraphQL/Extensions`
+
+1. Create class `ObjectFieldDescriptorExtensions.cs` in `Extensions` and add the `UseUpperCase` extension method
 
    ```csharp
-   public static IObjectFieldDescriptor UseUpperCase(
-       this IObjectFieldDescriptor descriptor)
-   {
-       return descriptor.Use(next => async context =>
-       {
-           await next(context);
+    namespace ConferencePlanner.GraphQL;
 
-           if (context.Result is string s)
-           {
-               context.Result = s.ToUpperInvariant();
-           }
-       });
-   }
+    public static class ObjectFieldDescriptorExtensions
+    {
+        public static IObjectFieldDescriptor UseUpperCase(
+              this IObjectFieldDescriptor descriptor)
+        {
+            return descriptor.Use(next => async context =>
+            {
+                await next(context);
+
+                if (context.Result is string s)
+                {
+                    context.Result = s.ToUpperInvariant();
+                }
+            });
+        }
+    }
    ```
 
 1. Head over to the `TrackType` in the `Types` folder and use the middleware on the `name` field.
@@ -176,7 +183,7 @@ Let us start by implementing the last Relay server specification we are still mi
 1. Head over to the `Tracks`directory and replace the `GetTracksAsync` resolver in the `TrackQueries.cs` with the following code.
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    [UsePaging]
    public IQueryable<Track> GetTracks(
        [ScopedService] ApplicationDbContext context) =>
@@ -254,7 +261,7 @@ Let us start by implementing the last Relay server specification we are still mi
 1. Head over to the `SpeakerQueries.cs` which are located in the `Speakers` directory and replace the `GetSpeakersAsync` resolver with the following code:
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    [UsePaging]
    public IQueryable<Speaker> GetSpeakers(
        [ScopedService] ApplicationDbContext context) =>
@@ -264,7 +271,7 @@ Let us start by implementing the last Relay server specification we are still mi
 1. Next, go to the `SessionQueries.cs` in the `Sessions` directory and replace the `GetSessionsAsync` with the following code:
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    [UsePaging]
    public IQueryable<Session> GetSessions(
        [ScopedService] ApplicationDbContext context) =>
@@ -276,7 +283,7 @@ Let us start by implementing the last Relay server specification we are still mi
 1. First, go back to the `SessionQueries.cs` in the `Sessions` directory and replace the `[UsePaging]` with `[UsePaging(typeof(NonNullType<SessionType>))]`.
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    [UsePaging(typeof(NonNullType<SessionType>))]
    public IQueryable<Session> GetSessions(
        [ScopedService] ApplicationDbContext context) =>
@@ -360,7 +367,7 @@ Filters like paging is a middleware that can be applied on `IQueryable`, like me
 1. Replace the `GetSessions` resolver with the following code:
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    [UsePaging(typeof(NonNullType<SessionType>))]
    [UseFiltering]
    [UseSorting]
@@ -394,7 +401,7 @@ Filters like paging is a middleware that can be applied on `IQueryable`, like me
 1. Go back to the `SessionQueries.cs` which is located in the `Sessions` directory and replace the `[UseFiltering]` attribute on top of the `GetSessions` resolver with the following `[UseFiltering(typeof(SessionFilterInputType))]`.
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    [UsePaging(typeof(NonNullType<SessionType>))]
    [UseFiltering(typeof(SessionFilterInputType))]
    [UseSorting]

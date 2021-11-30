@@ -81,7 +81,7 @@ Now, that we have some base classes for our mutation let us start to reorganize 
     [ExtendObjectType("Mutation")]
     public class SpeakerMutations
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<AddSpeakerPayload> AddSpeakerAsync(
             AddSpeakerInput input,
             [ScopedService] ApplicationDbContext context)
@@ -378,7 +378,7 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
         private class AttendeeResolvers
         {
             public async Task<IEnumerable<Session>> GetSessionsAsync(
-                Attendee attendee,
+                [Parent] Attendee attendee,
                 [ScopedService] ApplicationDbContext dbContext,
                 SessionByIdDataLoader sessionById,
                 CancellationToken cancellationToken)
@@ -437,7 +437,7 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
         private class SessionResolvers
         {
             public async Task<IEnumerable<Speaker>> GetSpeakersAsync(
-                Session session,
+                [Parent] Session session,
                 [ScopedService] ApplicationDbContext dbContext,
                 SpeakerByIdDataLoader speakerById,
                 CancellationToken cancellationToken)
@@ -452,7 +452,7 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
             }
 
             public async Task<IEnumerable<Attendee>> GetAttendeesAsync(
-                Session session,
+                [Parent] Session session,
                 [ScopedService] ApplicationDbContext dbContext,
                 AttendeeByIdDataLoader attendeeById,
                 CancellationToken cancellationToken)
@@ -467,7 +467,7 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
             }
 
             public async Task<Track?> GetTrackAsync(
-                Session session,
+                [Parent] Session session,
                 TrackByIdDataLoader trackById,
                 CancellationToken cancellationToken)
             {
@@ -511,7 +511,7 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
        private class TrackResolvers
        {
            public async Task<IEnumerable<Session>> GetSessionsAsync(
-               Track track,
+               [Parent] Track track,
                [ScopedService] ApplicationDbContext dbContext,
                SessionByIdDataLoader sessionById,
                CancellationToken cancellationToken)
@@ -541,7 +541,7 @@ We will start by adding the rest of the DataLoader that we will need. Then we wi
     [ExtendObjectType("Query")]
     public class SpeakerQueries
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
             context.Speakers.ToListAsync();
 
@@ -678,7 +678,7 @@ mkdir ConferencePlanner.GraphQL/Sessions
     [ExtendObjectType("Mutation")]
     public class SessionMutations
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<AddSessionPayload> AddSessionAsync(
             AddSessionInput input,
             [ScopedService] ApplicationDbContext context,
@@ -787,7 +787,7 @@ mkdir ConferencePlanner.GraphQL/Sessions
             return await trackById.LoadAsync(Session.Id, cancellationToken);
         }
 
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<IEnumerable<Speaker>?> GetSpeakersAsync(
             [ScopedService] ApplicationDbContext dbContext,
             SpeakerByIdDataLoader speakerById,
@@ -812,7 +812,7 @@ mkdir ConferencePlanner.GraphQL/Sessions
 1. Now, insert the following `scheduleSession` mutation to the `SessionMutations` class:
 
    ```csharp
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<ScheduleSessionPayload> ScheduleSessionAsync(
        ScheduleSessionInput input,
        [ScopedService] ApplicationDbContext context)
@@ -913,7 +913,7 @@ mkdir ConferencePlanner.GraphQL/Sessions
     [ExtendObjectType("Mutation")]
     public class TrackMutations
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<AddTrackPayload> AddTrackAsync(
             AddTrackInput input,
             [ScopedService] ApplicationDbContext context,
@@ -984,7 +984,7 @@ mkdir ConferencePlanner.GraphQL/Sessions
 1. Last, we will add the `renameTrack` mutation to our `TrackMutations` class.
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<RenameTrackPayload> RenameTrackAsync(
       RenameTrackInput input,
       [ScopedService] ApplicationDbContext context,
@@ -1021,7 +1021,7 @@ With GraphQL, we want to think about efficiency a lot. For instance, we offer mu
 Sure, we technically can do that already.
 
 ```graphql
-{
+query {
   speaker1: speaker(id: 1) {
     name
   }
@@ -1049,7 +1049,7 @@ In this section, we will optimize our `Query` type by bringing in more fields to
     [ExtendObjectType("Query")]
     public class SpeakerQueries
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public Task<List<Speaker>> GetSpeakersAsync(
             [ScopedService] ApplicationDbContext context) =>
             context.Speakers.ToListAsync();
@@ -1076,7 +1076,7 @@ In this section, we will optimize our `Query` type by bringing in more fields to
     [ExtendObjectType("Query")]
     public class SpeakerQueries
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public Task<List<Speaker>> GetSpeakersAsync(
             [ScopedService] ApplicationDbContext context) =>
             context.Speakers.ToListAsync();
@@ -1107,7 +1107,7 @@ In this section, we will optimize our `Query` type by bringing in more fields to
     [ExtendObjectType("Query")]
     public class SessionQueries
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<IEnumerable<Session>> GetSessionsAsync(
             [ScopedService] ApplicationDbContext context,
             CancellationToken cancellationToken) =>
@@ -1158,20 +1158,20 @@ In this section, we will optimize our `Query` type by bringing in more fields to
     [ExtendObjectType("Query")]
     public class TrackQueries
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<IEnumerable<Track>> GetTracksAsync(
             [ScopedService] ApplicationDbContext context,
             CancellationToken cancellationToken) =>
             await context.Tracks.ToListAsync(cancellationToken);
 
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public Task<Track> GetTrackByNameAsync(
             string name,
             [ScopedService] ApplicationDbContext context,
             CancellationToken cancellationToken) =>
             context.Tracks.FirstAsync(t => t.Name == name);
 
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<IEnumerable<Track>> GetTrackByNamesAsync(
             string[] names,
             [ScopedService] ApplicationDbContext context,

@@ -5,7 +5,7 @@ namespace ConferencePlanner.GraphQL.Speakers;
 [ExtendObjectType("Mutation")]
 public class SpeakerMutations
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<AddSpeakerPayload> AddSpeakerAsync(
         AddSpeakerInput input,
         [ScopedService] ApplicationDbContext context)

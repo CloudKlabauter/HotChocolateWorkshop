@@ -7,7 +7,7 @@ namespace ConferencePlanner.GraphQL.Speakers;
 [ExtendObjectType("Query")]
 public class SpeakerQueries
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     [UsePaging]
     public IQueryable<Speaker> GetSpeakers(
            [ScopedService] ApplicationDbContext context) =>

@@ -7,7 +7,7 @@ namespace ConferencePlanner.GraphQL.Attendees;
 [ExtendObjectType("Mutation")]
 public class AttendeeMutations
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<RegisterAttendeePayload> RegisterAttendeeAsync(
         RegisterAttendeeInput input,
         [ScopedService] ApplicationDbContext context,
@@ -28,7 +28,7 @@ public class AttendeeMutations
         return new RegisterAttendeePayload(attendee);
     }
 
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<CheckInAttendeePayload> CheckInAttendeeAsync(
       CheckInAttendeeInput input,
       [ScopedService] ApplicationDbContext context,

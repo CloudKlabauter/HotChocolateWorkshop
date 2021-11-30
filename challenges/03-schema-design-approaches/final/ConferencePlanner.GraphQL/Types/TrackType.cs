@@ -24,7 +24,7 @@ public class TrackType : ObjectType<Track>
     private class TrackResolvers
     {
         public async Task<IEnumerable<Session>> GetSessionsAsync(
-            Track track,
+            [Parent] Track track,
             [ScopedService] ApplicationDbContext dbContext,
             SessionByIdDataLoader sessionById,
             CancellationToken cancellationToken)

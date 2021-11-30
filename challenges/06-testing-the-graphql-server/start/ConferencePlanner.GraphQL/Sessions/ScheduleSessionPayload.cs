@@ -29,7 +29,7 @@ public class ScheduleSessionPayload : SessionPayloadBase
         return await trackById.LoadAsync(Session.Id, cancellationToken);
     }
 
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<IEnumerable<Speaker>?> GetSpeakersAsync(
         [ScopedService] ApplicationDbContext dbContext,
         SpeakerByIdDataLoader speakerById,

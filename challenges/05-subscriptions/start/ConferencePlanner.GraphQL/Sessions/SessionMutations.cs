@@ -6,7 +6,7 @@ namespace ConferencePlanner.GraphQL.Sessions;
 [ExtendObjectType("Mutation")]
 public class SessionMutations
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<AddSessionPayload> AddSessionAsync(
         AddSessionInput input,
         [ScopedService] ApplicationDbContext context,
@@ -44,7 +44,7 @@ public class SessionMutations
         return new AddSessionPayload(session);
     }
 
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<ScheduleSessionPayload> ScheduleSessionAsync(
        ScheduleSessionInput input,
        [ScopedService] ApplicationDbContext context)

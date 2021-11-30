@@ -35,7 +35,7 @@ Before we can start with introducing our new subscriptions, we need first to bri
     [ExtendObjectType("Query")]
     public class AttendeeQueries
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         [UsePaging]
         public IQueryable<Attendee> GetAttendees(
             [ScopedService] ApplicationDbContext context) =>
@@ -127,7 +127,7 @@ We now have the base types integrated and can start adding the attendee mutation
     [ExtendObjectType("Mutation")]
     public class AttendeeMutations
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<RegisterAttendeePayload> RegisterAttendeeAsync(
             RegisterAttendeeInput input,
             [ScopedService] ApplicationDbContext context,
@@ -209,7 +209,7 @@ Now that we have the mutation in to register new attendees, let us move on to ad
 1. Head back to the `AttendeeMutations.cs` class in the `Attendees` directory and add the `CheckInAttendeeAsync` resolver to it:
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    public async Task<CheckInAttendeePayload> CheckInAttendeeAsync(
        CheckInAttendeeInput input,
        [ScopedService] ApplicationDbContext context,
@@ -248,7 +248,7 @@ Now that we have the mutation in to register new attendees, let us move on to ad
     [ExtendObjectType("Mutation")]
     public class AttendeeMutations
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<RegisterAttendeePayload> RegisterAttendeeAsync(
             RegisterAttendeeInput input,
             [ScopedService] ApplicationDbContext context,
@@ -269,7 +269,7 @@ Now that we have the mutation in to register new attendees, let us move on to ad
             return new RegisterAttendeePayload(attendee);
         }
 
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<CheckInAttendeePayload> CheckInAttendeeAsync(
             CheckInAttendeeInput input,
             [ScopedService] ApplicationDbContext context,
@@ -456,7 +456,7 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
 1. Head over to the `SessionMutations` class in the `Sessions` directory and replace `ScheduleSessionAsync` with the following code:
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    public async Task<ScheduleSessionPayload> ScheduleSessionAsync(
        ScheduleSessionInput input,
        [ScopedService] ApplicationDbContext context,
@@ -570,7 +570,7 @@ The `onSessionScheduled` was quite simple since we did not subscribe to a dynami
 1. Head over to the `AttendeeMutations` class and replace the `CheckInAttendeeAsync` resolver with the following code:
 
    ```csharp
-   [UseApplicationDbContext]
+   [UseDbContext(typeof(ApplicationDbContext))]
    public async Task<CheckInAttendeePayload> CheckInAttendeeAsync(
        CheckInAttendeeInput input,
        [ScopedService] ApplicationDbContext context,
@@ -640,7 +640,7 @@ The `onSessionScheduled` was quite simple since we did not subscribe to a dynami
            [ID(nameof(Session))]
            public int SessionId { get; }
 
-           [UseApplicationDbContext]
+           [UseDbContext(typeof(ApplicationDbContext))]
            public async Task<int> CheckInCountAsync(
                [ScopedService] ApplicationDbContext context,
                CancellationToken cancellationToken) =>

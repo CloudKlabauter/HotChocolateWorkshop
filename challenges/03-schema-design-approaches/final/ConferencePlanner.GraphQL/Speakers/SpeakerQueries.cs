@@ -7,7 +7,7 @@ namespace ConferencePlanner.GraphQL.Speakers;
 [ExtendObjectType("Query")]
 public class SpeakerQueries
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
         context.Speakers.ToListAsync();
 

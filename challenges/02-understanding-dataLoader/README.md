@@ -52,59 +52,9 @@ The GraphQL execution engine will always try to execute fields in parallel in or
 
    > By default the `DBContext` pool will keep 128 `DBContext` instances in its pool.
 
-1. Create a new folder called `Extensions`
+1. Add a reference to the NuGet package package `HotChocolate.Data.EntityFramework` version `13.3.2`.
 
-   1. `mkdir ConferencePlanner.GraphQL/Extensions`
-
-1. Create a new file located in `Extensions` called `ObjectFieldDescriptorExtensions.cs` with the following code:
-
-   ```csharp
-    using Microsoft.EntityFrameworkCore;
-
-    namespace ConferencePlanner.GraphQL;
-
-    public static class ObjectFieldDescriptorExtensions
-    {
-        public static IObjectFieldDescriptor UseDbContext<TDbContext>(
-            this IObjectFieldDescriptor descriptor)
-            where TDbContext : DbContext
-        {
-            return descriptor.UseScopedService<TDbContext>(
-                create: s => s.GetRequiredService<IDbContextFactory<TDbContext>>().CreateDbContext(),
-                disposeAsync: (s, c) => c.DisposeAsync());
-        }
-    }
-   ```
-
-   > The `UseDbContext` will create a new middleware that handles scoping for a field.
-   > The `create` part will rent from the pool a `DBContext`, the `dispose`
-   > part will return it after the middleware is finished.
-   > All of this is handled transparently through the new `IDbContextFactory<T>` introduced
-   > with .NET 5.
-
-1. Create another file located in `Extensions` called `UseApplicationDbContextAttribute.cs` with the following code:
-
-   ```csharp
-    using System.Reflection;
-    using ConferencePlanner.GraphQL.Data;
-    using HotChocolate.Types.Descriptors;
-
-    namespace ConferencePlanner.GraphQL;
-
-    public class UseApplicationDbContextAttribute : ObjectFieldDescriptorAttribute
-    {
-        public override void OnConfigure(
-            IDescriptorContext context,
-            IObjectFieldDescriptor descriptor,
-            MemberInfo member)
-        {
-            descriptor.UseDbContext<ApplicationDbContext>();
-        }
-    }
-   ```
-
-   > The above code creates a so-called descriptor-attribute and allows us to wrap GraphQL
-   > configuration code into attributes that you can apply to .NET type system members.
+   1. `dotnet add ConferencePlanner.GraphQL package HotChocolate.Data.EntityFramework --version 12.3.2`
 
 1. Next, head over to the `Query.cs` and change it like the following:
 
@@ -116,13 +66,13 @@ The GraphQL execution engine will always try to execute fields in parallel in or
 
     public class Query
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
             context.Speakers.ToListAsync();
     }
    ```
 
-   > By annotating `UseApplicationDbContext` we are essentially applying a Middleware to the field resolver pipeline. We will have a more in-depth look into field middleware later on.
+   > By annotating `UseDbContext` we are essentially applying a Middleware to the field resolver pipeline. We will have a more in-depth look into field middleware later on.
 
    > **Important**: Note, that we no longer are returning the `IQueryable` but are executing the `IQueryable` by using `ToListAsync`. We will explain why later in the middleware and filter session.
 
@@ -135,7 +85,7 @@ The GraphQL execution engine will always try to execute fields in parallel in or
 
     public class Mutation
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public async Task<AddSpeakerPayload> AddSpeakerAsync(
             AddSpeakerInput input,
             [ScopedService] ApplicationDbContext context)
@@ -493,7 +443,7 @@ After having everything in let us have a look at our schema and see if something
 
     public class Query
     {
-        [UseApplicationDbContext]
+        [UseDbContext(typeof(ApplicationDbContext))]
         public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
             context.Speakers.ToListAsync();
 

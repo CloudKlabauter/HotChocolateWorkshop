@@ -7,7 +7,7 @@ namespace ConferencePlanner.GraphQL.Sessions;
 [ExtendObjectType("Query")]
 public class SessionQueries
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<IEnumerable<Session>> GetSessionsAsync(
         [ScopedService] ApplicationDbContext context,
         CancellationToken cancellationToken) =>

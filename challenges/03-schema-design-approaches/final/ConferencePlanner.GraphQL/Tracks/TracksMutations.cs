@@ -6,7 +6,7 @@ namespace ConferencePlanner.GraphQL.Tracks;
 [ExtendObjectType("Mutation")]
 public class TrackMutations
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<AddTrackPayload> AddTrackAsync(
         AddTrackInput input,
         [ScopedService] ApplicationDbContext context,
@@ -20,7 +20,7 @@ public class TrackMutations
         return new AddTrackPayload(track);
     }
 
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public async Task<RenameTrackPayload> RenameTrackAsync(
       RenameTrackInput input,
       [ScopedService] ApplicationDbContext context,

@@ -6,7 +6,7 @@ namespace ConferencePlanner.GraphQL;
 
 public class Query
 {
-    [UseApplicationDbContext]
+    [UseDbContext(typeof(ApplicationDbContext))]
     public Task<List<Speaker>> GetSpeakers([ScopedService] ApplicationDbContext context) =>
         context.Speakers.ToListAsync();
 
