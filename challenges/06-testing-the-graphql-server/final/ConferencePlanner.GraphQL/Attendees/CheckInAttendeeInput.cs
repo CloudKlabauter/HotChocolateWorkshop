@@ -4,7 +4,6 @@ namespace ConferencePlanner.GraphQL.Attendees;
 
 public class CheckInAttendeeInput
 {
-
     [ID(nameof(Session))]
     public int SessionId { get; set; }
 

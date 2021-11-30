@@ -783,6 +783,34 @@ In this section, we will optimize our `Query` type by bringing in more fields to
    dotnet run --project ConferencePlanner.GraphQL
    ```
 
+1. With this query you see that the id of the speaker is now a NodeId. If you decode this base64 you will see the following information:
+
+   - Entity (Speaker)
+   - ID (1)
+   - Datentype (integer)
+
+   ```graphql
+   query {
+     speakers {
+       id
+       name
+     }
+   }
+   ```
+
+1. With the NodeId you can now query the entity via the node query. Depending on the entity you have to select the desired return type.
+
+   ```graphql
+   query {
+     node(id: "U3BlYWtlcgppMQ==") {
+       ... on Speaker {
+         id
+         name
+       }
+     }
+   }
+   ```
+
 ## Summary
 
 We have covered quite a lot in this section. We have learned that GraphQL is designed for efficiency and that many of the schema design principals are designed around this core principle of GraphQL. We looked at how Mutations should be structured and that we should aim to design GraphQL schemas, not around a database schema but instead around our business model. With GraphQL we have such strong capabilities to express our business model that we should look beyond simple crud. Expressively design your schema so that each mutation conveys very clearly what it does. Allow your consumers to fetch single entities or multiple entities without forcing them to aliases.

@@ -86,6 +86,10 @@ A schema change test will simply create a snapshot of your schema and always fai
 
    The above test takes the service collection and builds from it a schema. We only integrates the part needed that we want to snapshot. On the schema, we are doing a `Print` that will print out the GraphQL SDL representation of the schema on which we do a `MatchSnapshot` that will create in the first run a snapshot file and will compare the SDL in consecutive runs against the snapshot file.
 
+1. Execute the tests with:
+
+   `dotnet test`
+
 ## Add a simple query tests
 
 1. Add the following test to the AttendeeTests.cs:

@@ -100,7 +100,7 @@ After `next` has finished executing, the middleware checks if the result is a `s
    ```
 
    ```graphql
-   {
+   query {
      tracks {
        name
      }

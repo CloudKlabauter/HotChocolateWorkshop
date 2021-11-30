@@ -199,6 +199,19 @@ Commands Explained
 
    ![Explore GraphQL schema with Banana Cake Pop](../../images/3-bcp-schema-explorer.png)
 
+1. With this query you can load all speakers and the fields **_id_**, **_name_**, **_bio_** and **_webSite_** will be returned. Since there are currently no speakers in the database, you will get an empty list.
+
+   ```graphql
+   query {
+     speakers {
+       id
+       name
+       bio
+       webSite
+     }
+   }
+   ```
+
 ## Adding Mutations
 
 So, far we have added the Query root type to our schema, which allows us to query speakers. However, at this point, there is no way to add or modify any data. In this section, we are going to add the root Mutation type to add new speakers to our database.

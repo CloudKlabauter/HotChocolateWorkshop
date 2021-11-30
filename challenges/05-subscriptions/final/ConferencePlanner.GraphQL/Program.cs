@@ -23,6 +23,9 @@ builder.Services
         .AddTypeExtension<SessionMutations>()
         .AddTypeExtension<SpeakerMutations>()
         .AddTypeExtension<TrackMutations>()
+    .AddSubscriptionType(d => d.Name("Subscription"))
+        .AddTypeExtension<SessionSubscriptions>()
+        .AddTypeExtension<AttendeeSubscriptions>()
     .AddType<AttendeeType>()
     .AddType<SessionType>()
     .AddType<SpeakerType>()
@@ -30,11 +33,13 @@ builder.Services
     .AddGlobalObjectIdentification()
     .AddFiltering()
     .AddSorting()
+    .AddInMemorySubscriptions()
     .AddDataLoader<SpeakerByIdDataLoader>()
     .AddDataLoader<SessionByIdDataLoader>();
 
 var app = builder.Build();
 
+app.UseWebSockets();
 app.UseRouting();
 app.MapGraphQL();
 

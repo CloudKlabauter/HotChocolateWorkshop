@@ -399,27 +399,23 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
 1. Add a new class `SessionSubscriptions` to the `Sessions` directory.
 
    ```csharp
-   using System.Threading;
-   using System.Threading.Tasks;
-   using ConferencePlanner.GraphQL.Data;
-   using ConferencePlanner.GraphQL.DataLoader;
-   using HotChocolate;
-   using HotChocolate.Types;
+    using ConferencePlanner.GraphQL.Data;
+    using ConferencePlanner.GraphQL.DataLoader;
 
-   namespace ConferencePlanner.GraphQL.Sessions
-   {
-       [ExtendObjectType(Name = "Subscription")]
-       public class SessionSubscriptions
-       {
-           [Subscribe]
-           [Topic]
-           public Task<Session> OnSessionScheduledAsync(
-               [EventMessage] int sessionId,
-               SessionByIdDataLoader sessionById,
-               CancellationToken cancellationToken) =>
-               sessionById.LoadAsync(sessionId, cancellationToken);
-       }
-   }
+
+    namespace ConferencePlanner.GraphQL.Sessions;
+
+    [ExtendObjectType("Subscription")]
+    public class SessionSubscriptions
+    {
+        [Subscribe]
+        [Topic]
+        public Task<Session> OnSessionScheduledAsync(
+            [EventMessage] int sessionId,
+            SessionByIdDataLoader sessionById,
+            CancellationToken cancellationToken) =>
+            sessionById.LoadAsync(sessionId, cancellationToken);
+    }
    ```
 
    > The `[Topic]` attribute can be put on the method or a parameter of the method and will infer the pub/sub-topic for this subscription.
@@ -530,7 +526,7 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
 
    Execute the subscription query. Nothing will happen at this point, and you will just see a loading indicator.
 
-   ![Subscription Waiting for Events](images/31-bcp-subscribe.png)
+   ![Subscription Waiting for Events](../../images/31-bcp-subscribe.png)
 
 1. Open another tab in Banana Cake Pop and add the following query:
 
@@ -621,87 +617,76 @@ The `onSessionScheduled` was quite simple since we did not subscribe to a dynami
 1. Add a new class `SessionAttendeeCheckIn` to the `Attendees` directory. This will be our subscription payload.
 
    ```csharp
-   using System.Linq;
-   using System.Threading;
-   using System.Threading.Tasks;
-   using Microsoft.EntityFrameworkCore;
-   using ConferencePlanner.GraphQL.Data;
-   using ConferencePlanner.GraphQL.DataLoader;
-   using HotChocolate;
-   using HotChocolate.Types.Relay;
+    using Microsoft.EntityFrameworkCore;
+    using ConferencePlanner.GraphQL.Data;
+    using ConferencePlanner.GraphQL.DataLoader;
 
-   namespace ConferencePlanner.GraphQL.Attendees
-   {
-       public class SessionAttendeeCheckIn
-       {
-           public SessionAttendeeCheckIn(int attendeeId, int sessionId)
-           {
-               AttendeeId = attendeeId;
-               SessionId = sessionId;
-           }
 
-           [ID(nameof(Attendee))]
-           public int AttendeeId { get; }
+    namespace ConferencePlanner.GraphQL.Attendees;
 
-           [ID(nameof(Session))]
-           public int SessionId { get; }
+    public class SessionAttendeeCheckIn
+    {
+        public SessionAttendeeCheckIn(int attendeeId, int sessionId)
+        {
+            AttendeeId = attendeeId;
+            SessionId = sessionId;
+        }
 
-           [UseDbContext(typeof(ApplicationDbContext))]
-           public async Task<int> CheckInCountAsync(
-               [ScopedService] ApplicationDbContext context,
-               CancellationToken cancellationToken) =>
-               await context.Sessions
-                   .Where(session => session.Id == SessionId)
-                   .SelectMany(session => session.SessionAttendees)
-                   .CountAsync(cancellationToken);
+        [ID(nameof(Attendee))]
+        public int AttendeeId { get; }
 
-           public Task<Attendee> GetAttendeeAsync(
-               AttendeeByIdDataLoader attendeeById,
-               CancellationToken cancellationToken) =>
-               attendeeById.LoadAsync(AttendeeId, cancellationToken);
+        [ID(nameof(Session))]
+        public int SessionId { get; }
 
-           public Task<Session> GetSessionAsync(
-               SessionByIdDataLoader sessionById,
-               CancellationToken cancellationToken) =>
-               sessionById.LoadAsync(AttendeeId, cancellationToken);
-       }
-   }
+        [UseDbContext(typeof(ApplicationDbContext))]
+        public async Task<int> CheckInCountAsync(
+            [ScopedService] ApplicationDbContext context,
+            CancellationToken cancellationToken) =>
+            await context.Sessions
+                .Where(session => session.Id == SessionId)
+                .SelectMany(session => session.SessionAttendees)
+                .CountAsync(cancellationToken);
+
+        public Task<Attendee> GetAttendeeAsync(
+            AttendeeByIdDataLoader attendeeById,
+            CancellationToken cancellationToken) =>
+            attendeeById.LoadAsync(AttendeeId, cancellationToken);
+
+        public Task<Session> GetSessionAsync(
+            SessionByIdDataLoader sessionById,
+            CancellationToken cancellationToken) =>
+            sessionById.LoadAsync(AttendeeId, cancellationToken);
+    }
    ```
 
 1. Create a new class, `AttendeeSubscriptions` and put it in the `Attendees` directory.
 
    ```csharp
-   using System.Threading;
-   using System.Threading.Tasks;
-   using ConferencePlanner.GraphQL.Data;
-   using ConferencePlanner.GraphQL.DataLoader;
-   using HotChocolate;
-   using HotChocolate.Execution;
-   using HotChocolate.Subscriptions;
-   using HotChocolate.Types;
-   using HotChocolate.Types.Relay;
+    using ConferencePlanner.GraphQL.Data;
+    using ConferencePlanner.GraphQL.DataLoader;
+    using HotChocolate.Execution;
+    using HotChocolate.Subscriptions;
 
-   namespace ConferencePlanner.GraphQL.Attendees
-   {
-       [ExtendObjectType(Name = "Subscription")]
-       public class AttendeeSubscriptions
-       {
-           [Subscribe(With = nameof(SubscribeToOnAttendeeCheckedInAsync))]
-           public SessionAttendeeCheckIn OnAttendeeCheckedIn(
-               [ID(nameof(Session))] int sessionId,
-               [EventMessage] int attendeeId,
-               SessionByIdDataLoader sessionById,
-               CancellationToken cancellationToken) =>
-               new SessionAttendeeCheckIn(attendeeId, sessionId);
+    namespace ConferencePlanner.GraphQL.Attendees;
 
-           public async ValueTask<ISourceStream<int>> SubscribeToOnAttendeeCheckedInAsync(
-               int sessionId,
-               [Service] ITopicEventReceiver eventReceiver,
-               CancellationToken cancellationToken) =>
-               await eventReceiver.SubscribeAsync<string, int>(
-                   "OnAttendeeCheckedIn_" + sessionId, cancellationToken);
-       }
-   }
+    [ExtendObjectType("Subscription")]
+    public class AttendeeSubscriptions
+    {
+        [Subscribe(With = nameof(SubscribeToOnAttendeeCheckedInAsync))]
+        public SessionAttendeeCheckIn OnAttendeeCheckedIn(
+            [ID(nameof(Session))] int sessionId,
+            [EventMessage] int attendeeId,
+            SessionByIdDataLoader sessionById,
+            CancellationToken cancellationToken) =>
+            new SessionAttendeeCheckIn(attendeeId, sessionId);
+
+        public async ValueTask<ISourceStream<int>> SubscribeToOnAttendeeCheckedInAsync(
+            int sessionId,
+            [Service] ITopicEventReceiver eventReceiver,
+            CancellationToken cancellationToken) =>
+            await eventReceiver.SubscribeAsync<string, int>(
+                "OnAttendeeCheckedIn_" + sessionId, cancellationToken);
+    }
    ```
 
    `OnAttendeeCheckedIn` represents our resolver like in the first subscription we built, but now in our `SubscribeAttribute` we are referring to a method called `SubscribeToOnAttendeeCheckedInAsync`. So, instead of letting the system generate a subscribe resolver that handles subscribing to the pub/sub-system we are creating it ourselves in order to control how it is done or event order to filter out events that we do not want to pass down.
