@@ -15,9 +15,8 @@
 
 .vscode/
 
-*.db-shm
-*.db-wal
-challenges/*/*/ConferencePlanner.GraphQL/conferences.db
+/challenges/*/*/*.db-shm
+/challenges/*/*/*.db-wal
 
 # Mono auto generated files
 mono_crash.*
