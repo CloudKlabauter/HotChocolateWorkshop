@@ -1,0 +1,7 @@
+mutation AddSpeaker($name: String!, $bio: String, $webSite: String) {
+  addSpeaker(input: { name: $name, bio: $bio, webSite: $webSite }) {
+    speaker {
+      id
+    }
+  }
+}

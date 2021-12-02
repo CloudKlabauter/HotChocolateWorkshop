@@ -1,0 +1,504 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Query {
+  "Fetches an object given its ID."
+  node("ID of the object." id: ID!): Node
+  "Lookup nodes by a list of IDs."
+  nodes("The list of node IDs." ids: [ID!]!): [Node]!
+  "Gets all attendees of this conference."
+  attendees("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): AttendeesConnection
+  "Gets an attendee by its identifier."
+  attendeeById("The attendee identifier." id: ID!): Attendee!
+  attendeesById(ids: [ID!]!): [Attendee!]!
+  sessions("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: SessionFilterInput order: [SessionSortInput!]): SessionsConnection
+  sessionById(id: ID!): Session!
+  sessionsById(ids: [ID!]!): [Track!]!
+  speakers("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): SpeakersConnection
+  speakerById(id: ID!): Speaker!
+  speakersById(ids: [ID!]!): [Speaker!]!
+  tracks("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): TracksConnection
+  trackByName(name: String!): Track!
+  trackByNames(names: [String!]!): [Track!]!
+  trackById(id: ID!): Track!
+}
+
+type Mutation {
+  registerAttendee(input: RegisterAttendeeInput!): RegisterAttendeePayload!
+  checkInAttendee(input: CheckInAttendeeInput!): CheckInAttendeePayload!
+  addSession(input: AddSessionInput!): AddSessionPayload!
+  scheduleSession(input: ScheduleSessionInput!): ScheduleSessionPayload!
+  renameSession(input: RenameSessionInput!): RenameSessionPayload!
+  addSpeaker(input: AddSpeakerInput!): AddSpeakerPayload!
+  modifySpeaker(input: ModifySpeakerInput!): ModifySpeakerPayload!
+  addTrack(input: AddTrackInput!): AddTrackPayload!
+  renameTrack(input: RenameTrackInput!): RenameTrackPayload!
+}
+
+type Subscription {
+  onAttendeeCheckedIn(sessionId: ID!): SessionAttendeeCheckIn!
+  onSessionScheduled: Session!
+}
+
+"The node interface is implemented by entities that have a global unique identifier."
+interface Node {
+  id: ID!
+}
+
+"A connection to a list of items."
+type AttendeesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [AttendeesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Attendee!]
+}
+
+input SessionFilterInput {
+  and: [SessionFilterInput!]
+  or: [SessionFilterInput!]
+  title: StringOperationFilterInput
+  abstract: StringOperationFilterInput
+  startTime: ComparableNullableOfDateTimeOffsetOperationFilterInput
+  endTime: ComparableNullableOfDateTimeOffsetOperationFilterInput
+  duration: ComparableTimeSpanOperationFilterInput
+  sessionSpeakers: ListFilterInputTypeOfSessionSpeakerFilterInput
+  sessionAttendees: ListFilterInputTypeOfSessionAttendeeFilterInput
+  track: TrackFilterInput
+}
+
+input SessionSortInput {
+  id: SortEnumType
+  title: SortEnumType
+  abstract: SortEnumType
+  startTime: SortEnumType
+  endTime: SortEnumType
+  duration: SortEnumType
+  trackId: SortEnumType
+  track: TrackSortInput
+}
+
+"A connection to a list of items."
+type SessionsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [SessionsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Session!]
+}
+
+"A connection to a list of items."
+type SessionAttendeesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [SessionAttendeesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Attendee!]
+}
+
+"A connection to a list of items."
+type SpeakersConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [SpeakersEdge!]
+  "A flattened list of the nodes."
+  nodes: [Speaker!]
+}
+
+"A connection to a list of items."
+type TracksConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [TracksEdge!]
+  "A flattened list of the nodes."
+  nodes: [Track!]
+}
+
+"A connection to a list of items."
+type TrackSessionsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [TrackSessionsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Session!]
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+type Attendee {
+  id: Int!
+  firstName: String!
+  lastName: String!
+  userName: String!
+  emailAddress: String
+  country: String
+  sessionsAttendees: [SessionAttendee!]!
+}
+
+"An edge in a connection."
+type AttendeesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Attendee!
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+input ComparableNullableOfDateTimeOffsetOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input ComparableTimeSpanOperationFilterInput {
+  eq: TimeSpan
+  neq: TimeSpan
+  in: [TimeSpan!]
+  nin: [TimeSpan!]
+  gt: TimeSpan
+  ngt: TimeSpan
+  gte: TimeSpan
+  ngte: TimeSpan
+  lt: TimeSpan
+  nlt: TimeSpan
+  lte: TimeSpan
+  nlte: TimeSpan
+}
+
+input ListFilterInputTypeOfSessionSpeakerFilterInput {
+  all: SessionSpeakerFilterInput
+  none: SessionSpeakerFilterInput
+  some: SessionSpeakerFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfSessionAttendeeFilterInput {
+  all: SessionAttendeeFilterInput
+  none: SessionAttendeeFilterInput
+  some: SessionAttendeeFilterInput
+  any: Boolean
+}
+
+input TrackFilterInput {
+  and: [TrackFilterInput!]
+  or: [TrackFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  name: StringOperationFilterInput
+  sessions: ListFilterInputTypeOfSessionFilterInput
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+input TrackSortInput {
+  id: SortEnumType
+  name: SortEnumType
+}
+
+type Session implements Node {
+  id: ID!
+  title: String!
+  abstract: String
+  startTime: DateTime
+  endTime: DateTime
+  duration: TimeSpan!
+  trackId: Int
+  track: Track
+  speakers: [Speaker!]!
+  attendees("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): SessionAttendeesConnection
+}
+
+"An edge in a connection."
+type SessionsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Session!
+}
+
+"An edge in a connection."
+type SessionAttendeesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Attendee!
+}
+
+type Speaker implements Node {
+  id: ID!
+  name: String!
+  bio: String
+  webSite: String
+  sessions: [Session!]!
+  sessionsExpensive: [Session!]!
+  sessionsStream: [Session!]!
+}
+
+"An edge in a connection."
+type SpeakersEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Speaker!
+}
+
+type Track implements Node {
+  id: ID!
+  name: String!
+  sessions("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): TrackSessionsConnection
+}
+
+"An edge in a connection."
+type TracksEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Track!
+}
+
+"An edge in a connection."
+type TrackSessionsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Session!
+}
+
+input SessionSpeakerFilterInput {
+  and: [SessionSpeakerFilterInput!]
+  or: [SessionSpeakerFilterInput!]
+  sessionId: ComparableInt32OperationFilterInput
+  session: SessionFilterInput
+  speakerId: ComparableInt32OperationFilterInput
+  speaker: SpeakerFilterInput
+}
+
+input SessionAttendeeFilterInput {
+  and: [SessionAttendeeFilterInput!]
+  or: [SessionAttendeeFilterInput!]
+  sessionId: ComparableInt32OperationFilterInput
+  session: SessionFilterInput
+  attendeeId: ComparableInt32OperationFilterInput
+  attendee: AttendeeFilterInput
+}
+
+input ComparableInt32OperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int!]
+  nin: [Int!]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input ListFilterInputTypeOfSessionFilterInput {
+  all: SessionFilterInput
+  none: SessionFilterInput
+  some: SessionFilterInput
+  any: Boolean
+}
+
+input SpeakerFilterInput {
+  and: [SpeakerFilterInput!]
+  or: [SpeakerFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  name: StringOperationFilterInput
+  bio: StringOperationFilterInput
+  webSite: StringOperationFilterInput
+  sessionSpeakers: ListFilterInputTypeOfSessionSpeakerFilterInput
+}
+
+input AttendeeFilterInput {
+  and: [AttendeeFilterInput!]
+  or: [AttendeeFilterInput!]
+  id: ComparableInt32OperationFilterInput
+  firstName: StringOperationFilterInput
+  lastName: StringOperationFilterInput
+  userName: StringOperationFilterInput
+  emailAddress: StringOperationFilterInput
+  country: StringOperationFilterInput
+  sessionsAttendees: ListFilterInputTypeOfSessionAttendeeFilterInput
+}
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
+
+input RenameSessionInput {
+  sessionId: ID!
+  title: String!
+}
+
+type RenameSessionPayload {
+  session: Session
+  errors: [UserError!]
+}
+
+input ScheduleSessionInput {
+  sessionId: ID!
+  trackId: ID!
+  startTime: DateTime!
+  endTime: DateTime!
+}
+
+type ScheduleSessionPayload {
+  track: Track
+  speakers: [Speaker!]
+  session: Session
+  errors: [UserError!]
+}
+
+input AddSessionInput {
+  title: String!
+  abstract: String
+  speakerIds: [ID!]!
+}
+
+type AddSessionPayload {
+  session: Session
+  errors: [UserError!]
+}
+
+"The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
+scalar TimeSpan
+
+type SessionAttendeeCheckIn {
+  checkInCount: Int!
+  attendee: Attendee!
+  session: Session!
+  attendeeId: ID!
+  sessionId: ID!
+}
+
+input CheckInAttendeeInput {
+  sessionId: ID!
+  attendeeId: ID!
+}
+
+type CheckInAttendeePayload {
+  session: Session
+  attendee: Attendee
+  errors: [UserError!]
+}
+
+input RegisterAttendeeInput {
+  firstName: String!
+  lastName: String!
+  userName: String!
+  emailAddress: String!
+}
+
+type RegisterAttendeePayload {
+  attendee: Attendee
+  errors: [UserError!]
+}
+
+type SessionAttendee {
+  sessionId: Int!
+  session: Session
+  attendeeId: Int!
+  attendee: Attendee
+}
+
+type AddSpeakerPayload {
+  speaker: Speaker
+  errors: [UserError!]
+}
+
+input AddSpeakerInput {
+  name: String!
+  bio: String
+  webSite: String
+}
+
+type ModifySpeakerPayload {
+  speaker: Speaker
+  errors: [UserError!]
+}
+
+input ModifySpeakerInput {
+  id: ID!
+  name: String
+  bio: String
+  webSite: String
+}
+
+type AddTrackPayload {
+  track: Track
+  errors: [UserError!]
+}
+
+input AddTrackInput {
+  name: String!
+}
+
+type RenameTrackPayload {
+  track: Track
+  errors: [UserError!]
+}
+
+input RenameTrackInput {
+  id: ID!
+  name: String!
+}
+
+type SessionSpeaker {
+  sessionId: Int!
+  session: Session
+  speakerId: Int!
+  speaker: Speaker
+}
+
+type UserError {
+  message: String!
+  code: String!
+}
