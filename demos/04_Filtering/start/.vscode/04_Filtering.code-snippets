@@ -1,0 +1,10 @@
+{
+  "01_Paging_Sorting_Filter_Attributes": {
+    "prefix": "hc_attributes",
+    "body": ["[UsePaging]", "\t[UseSorting]", "\t[UseFiltering]"]
+  },
+  "02_Register_Filtering_Sorting": {
+    "prefix": "hc_register_filtering",
+    "body": ["builder.Services", "\t.AddGraphQLServer()", "\t.AddQueryType<Query>()", "\t.AddMutationType<Mutation>()", "\t.AddType<AuthorType>()", "\t.AddType<BookType>()", "\t.AddGlobalObjectIdentification()", "\t.AddFiltering()", "\t.AddSorting()", "\t.AddDataLoader<BookByIdDataLoader>()", "\t.AddDataLoader<AuthorByIdDataLoader>();"]
+  }
+}
