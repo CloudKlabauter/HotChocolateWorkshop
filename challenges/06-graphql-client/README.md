@@ -1,3 +1,13 @@
+- [GraphQL Client](#graphql-client)
+  - [Add the Strawberry Shake CLI tools](#add-the-strawberry-shake-cli-tools)
+  - [Create a console project](#create-a-console-project)
+  - [Install the required packages](#install-the-required-packages)
+  - [Add a GraphQL client to your project using the CLI tools](#add-a-graphql-client-to-your-project-using-the-cli-tools)
+  - [Use the ConferenceClient to perform a simple fetch](#use-the-conferenceclient-to-perform-a-simple-fetch)
+  - [Add a mutation to the ConferenceClient](#add-a-mutation-to-the-conferenceclient)
+
+# GraphQL Client
+
 In this tutorial we will walk you through the basics of adding a Strawberry Shake GraphQL client to a console project. For this example we will create a simple console application and fetch some simple data from our demo backend.
 
 Strawberry Shake is not limited to console application and can be used with any .NET standard compliant library.
@@ -9,7 +19,7 @@ In this tutorial, we will teach you:
 - How to use the generated client in a classical or reactive way.
 - How to disable state management for ASP.NET Core use-cases.
 
-## Step 1: Add the Strawberry Shake CLI tools
+## Add the Strawberry Shake CLI tools
 
 The Strawberry Shake tool will help you to setup your project to create a GraphQL client.
 
@@ -27,7 +37,7 @@ Open your preferred terminal and select a directory where you want to add the co
    dotnet tool install StrawberryShake.Tools --local
    ```
 
-## Step 2: Create a console project
+## Create a console project
 
 Next, we will create our console project so that we have a little playground.
 
@@ -49,7 +59,7 @@ Next, we will create our console project so that we have a little playground.
    dotnet sln add ./GraphQLConsole
    ```
 
-## Step 3: Install the required packages
+## Install the required packages
 
 Strawberry Shake supports multiple GraphQL transport protocols. In this example we will use the standard GraphQL over HTTP protocol to interact with our GraphQL server.
 
@@ -79,7 +89,7 @@ When using the HTTP protocol we also need the HttpClientFactory and the Microsof
    dotnet add GraphQLConsole package Microsoft.Extensions.Http
    ```
 
-## Step 4: Add a GraphQL client to your project using the CLI tools
+## Add a GraphQL client to your project using the CLI tools
 
 To add a client to your project, you need to run the `dotnet graphql init {{ServerUrl}} -n {{ClientName}}`.
 
@@ -167,7 +177,7 @@ With the project compiled you now should see a directory `Generated`. The genera
    IConferenceClient client = services.GetRequiredService<IConferenceClient>();
    ```
 
-## Step 5: Use the ConferenceClient to perform a simple fetch
+## Use the ConferenceClient to perform a simple fetch
 
 In this section we will perform a simple fetch with our `ConferenceClient` and output the result to the console.
 
@@ -203,7 +213,7 @@ In this section we will perform a simple fetch with our `ConferenceClient` and o
 
 ![Started console application that shows a list of sessions](../../images/41-client-session-list.png)
 
-## Step 6: Add a mutation to the ConferenceClient
+## Add a mutation to the ConferenceClient
 
 1. Create new file `AddSpeaker.graphql` with the following content:
 
