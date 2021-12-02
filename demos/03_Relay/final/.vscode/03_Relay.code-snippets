@@ -1,0 +1,18 @@
+{
+  "01_AuthorByIdDataLoader": {
+    "prefix": "hc_authorByIdDataLoader",
+    "body": ["using Microsoft.EntityFrameworkCore;", "using Library.GraphQL.Data;", "", "namespace Library.GraphQL.DataLoader;", "", "public class AuthorByIdDataLoader : BatchDataLoader<int, Author>", "{", "\tprivate readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;", "", "\tpublic AuthorByIdDataLoader(", "\t\tIBatchScheduler batchScheduler,", "\t\tIDbContextFactory<ApplicationDbContext> dbContextFactory)", "\t\t: base(batchScheduler)", "\t{", "\t\t_dbContextFactory = dbContextFactory ??", "\t\t\tthrow new ArgumentNullException(nameof(dbContextFactory));", "\t}", "", "\tprotected override async Task<IReadOnlyDictionary<int, Author>> LoadBatchAsync(", "\t\tIReadOnlyList<int> keys,", "\t\tCancellationToken cancellationToken)", "\t{", "\t\tawait using ApplicationDbContext dbContext =", "\t\t\t_dbContextFactory.CreateDbContext();", "", "\t\treturn await dbContext.Authors", "\t\t\t.Where(s => keys.Contains(s.Id))", "\t\t\t.ToDictionaryAsync(t => t.Id, cancellationToken);", "\t}", "}"]
+  },
+  "02_AuthorNodeImplementation": {
+    "prefix": "hc_authorNodeField",
+    "body": ["descriptor", "\t\t.ImplementsNode()", "\t\t.IdField(t => t.Id)", "\t\t.ResolveNode((ctx, id) => ctx.DataLoader<AuthorByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));"]
+  },
+  "03_BookType": {
+    "prefix": "hc_bookType",
+    "body": ["using Library.GraphQL.Data;", "using Library.GraphQL.DataLoader;", "", "namespace Library.GraphQL.Types;", "", "public class BookType : ObjectType<Book>", "{", "\tprotected override void Configure(IObjectTypeDescriptor<Book> descriptor)", "\t{", "\t\tdescriptor", "\t\t.ImplementsNode()", "\t\t.IdField(t => t.Id)", "\t\t.ResolveNode((ctx, id) => ctx.DataLoader<BookByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));", "", "\t\tdescriptor", "\t\t\t.Field(t => t.Author)", "\t\t\t.ResolveWith<BookResolvers>(t => t.GetAuthorAsync(default!, default!, default!, default))", "\t\t\t.UseDbContext<ApplicationDbContext>()", "\t\t\t.Name(\"author\");", "\t}", "", "\tprivate class BookResolvers", "\t{", "\t\tpublic async Task<IEnumerable<Author>?> GetAuthorAsync(", "\t\t\t[Parent] Book book,", "\t\t\t[ScopedService] ApplicationDbContext dbContext,", "\t\t\tAuthorByIdDataLoader authorById,", "\t\t\tCancellationToken cancellationToken)", "\t\t{", "", "\t\t\tif (book.AuthorId == null)", "\t\t\t\treturn null;", "", "\t\t\tint[] authorIds = new int[] { book.AuthorId.Value };", "", "\t\t\treturn await authorById.LoadAsync(authorIds, cancellationToken);", "\t\t}", "\t}", "}"]
+  },
+  "04_GraphQL_Service_Registration": {
+    "prefix": "hc_server_registration",
+    "body": ["builder.Services", "\t.AddGraphQLServer()", "\t.AddQueryType<Query>()", "\t.AddMutationType<Mutation>()", "\t.AddType<AuthorType>()", "\t.AddType<BookType>()", "\t.AddGlobalObjectIdentification()", "\t.AddDataLoader<BookByIdDataLoader>()", "\t.AddDataLoader<AuthorByIdDataLoader>();"]
+  }
+}
