@@ -44,7 +44,9 @@ The challenges can be solved individually or in teams. We will provide you separ
 
 [05: Adding real-time functionality with subscriptions](challenges/05-subscriptions/README.md)
 
-[06: Testing the GraphQL server](challenges/06-testing-the-graphql-server/README.md)
+[06: GraphQL Client](challenges/06-graphql-client/README.md)
+
+[07: Testing the GraphQL server](challenges/07-testing-the-graphql-server/README.md)
 
 ---
 

@@ -1,0 +1,38 @@
+{
+  "01_UseDbContext": {
+    "prefix": "hc_UseDbContext",
+    "body": ["[UseDbContext(typeof(ApplicationDbContext))]"]
+  },
+  "02_AuthorBookRef": {
+    "prefix": "hc_AuthorBookRef",
+    "body": ["public ICollection<Book> Books { get; set; } =", "\t\t   new List<Book>();"]
+  },
+  "03_BooksAuthorRef": {
+    "prefix": "hc_BookAuthorRef",
+    "body": ["public Author? Author { get; set; }"]
+  },
+  "04_BookDataLoader": {
+    "prefix": "hc_bookDataLoader",
+    "body": ["using Microsoft.EntityFrameworkCore;", "using Library.GraphQL.Data;", "", "namespace Library.GraphQL.DataLoader;", "", "public class BookByIdDataLoader : BatchDataLoader<int, Book>", "{", "\tprivate readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;", "", "\tpublic BookByIdDataLoader(", "\t\tIBatchScheduler batchScheduler,", "\t\tIDbContextFactory<ApplicationDbContext> dbContextFactory)", "\t\t: base(batchScheduler)", "\t{", "\t\t_dbContextFactory = dbContextFactory ??", "\t\t\tthrow new ArgumentNullException(nameof(dbContextFactory));", "\t}", "", "\tprotected override async Task<IReadOnlyDictionary<int, Book>> LoadBatchAsync(", "\t\tIReadOnlyList<int> keys,", "\t\tCancellationToken cancellationToken)", "\t{", "\t\tawait using ApplicationDbContext dbContext =", "\t\t\t_dbContextFactory.CreateDbContext();", "", "\t\treturn await dbContext.Books", "\t\t\t.Where(s => keys.Contains(s.Id))", "\t\t\t.ToDictionaryAsync(t => t.Id, cancellationToken);", "\t}", "}"]
+  },
+  "05_BookByIdQuery": {
+    "prefix": "hc_bookByIdQuery",
+    "body": ["\tpublic Task<Book> GetBookAsync(int id, BookByIdDataLoader dataLoader, CancellationToken cancellationToken) =>", "\t\tdataLoader.LoadAsync(id, cancellationToken);"]
+  },
+  "06_AuthorType": {
+    "prefix": "hc_authorType",
+    "body": ["using Microsoft.EntityFrameworkCore;", "using Library.GraphQL.Data;", "using Library.GraphQL.DataLoader;", "", "namespace Library.GraphQL.Types;", "", "public class AuthorType : ObjectType<Author>", "{", "\tprotected override void Configure(IObjectTypeDescriptor<Author> descriptor)", "\t{", "\t\tdescriptor", "\t\t\t.Field(t => t.Books)", "\t\t\t.ResolveWith<AuthorResolvers>(t => t.GetBooksAsync(default!, default!, default!, default))", "\t\t\t.UseDbContext<ApplicationDbContext>()", "\t\t\t.Name(\"books\");", "\t}", "", "\tprivate class AuthorResolvers", "\t{", "\t\tpublic async Task<IEnumerable<Book>> GetBooksAsync(", "\t\t\t[Parent] Author author,", "\t\t\t[ScopedService] ApplicationDbContext dbContext,", "\t\t\tBookByIdDataLoader bookById,", "\t\t\tCancellationToken cancellationToken)", "\t\t{", "\t\t\tint[] bookIds = await dbContext.Books", "\t\t\t\t.Where(s => s.AuthorId == author.Id)", "\t\t\t\t.Select(s => s.Id)", "\t\t\t\t.ToArrayAsync();", "", "\t\t\treturn await bookById.LoadAsync(bookIds, cancellationToken);", "\t\t}", "\t}", "}"]
+  },
+  "07_AuthorInput": {
+    "prefix": "hc_authorInput",
+    "body": ["namespace Library.GraphQL;", "", "public class AddAuthorInput", "{", "\tpublic string Name { get; set; } = default!;", "}"]
+  },
+  "08_AuthorPayload": {
+    "prefix": "hc_authorPayload",
+    "body": ["using Library.GraphQL.Data;", "", "namespace Library.GraphQL;", "", "public class AddAuthorPayload", "{", "\tpublic AddAuthorPayload(Author author)", "\t{", "\t\tAuthor = author;", "\t}", "", "\tpublic Author Author { get; }", "}"]
+  },
+  "09_AddAuthorMutation": {
+    "prefix": "hc_addAuthorMutation",
+    "body": ["\t[UseDbContext(typeof(ApplicationDbContext))]", "\tpublic async Task<AddAuthorPayload> AddAuthorAsync(", "\t   AddAuthorInput input,", "\t   [ScopedService] ApplicationDbContext context)", "\t{", "\t\tvar author = new Author", "\t\t{", "\t\t\tName = input.Name", "\t\t};", "", "\t\tcontext.Authors.Add(author);", "\t\tawait context.SaveChangesAsync();", "", "\t\treturn new AddAuthorPayload(author);", "\t}"]
+  }
+}
