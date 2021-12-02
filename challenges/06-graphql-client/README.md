@@ -131,6 +131,7 @@ Now that everything is in place let us write our first query to ask for a list o
    ```
 
    > If you're using Visual Studio, it may add an `ItemGroup` in your `.csproj` file excluding your newly created `*.graphql` file. In that case, delete the corresponding section from the project file:
+   >
    > ```diff
    > - <ItemGroup>
    > -   <GraphQL Remove="GetSessions.graphql" />
@@ -180,18 +181,18 @@ In this section we will perform a simple fetch with our `ConferenceClient` and o
    using StrawberryShake;
 
    var serviceCollection = new ServiceCollection();
-   
+
    serviceCollection
        .AddConferenceClient()
        .ConfigureHttpClient(client => client.BaseAddress = new Uri("https://workshop.chillicream.com/graphql"));
-   
+
    IServiceProvider services = serviceCollection.BuildServiceProvider();
-   
+
    IConferenceClient client = services.GetRequiredService<IConferenceClient>();
-   
+
    var getSessionResult = await client.GetSessions.ExecuteAsync();
    getSessionResult.EnsureNoErrors();
-   
+
    foreach (var session in getSessionResult.Data!.Sessions!.Nodes!)
    {
        Console.WriteLine(session.Title);
@@ -234,3 +235,5 @@ In this section we will perform a simple fetch with our `ConferenceClient` and o
 4. Start the console application with `dotnet run --project ./GraphQLConsole` and see if your code works.
 
 ![Started console application that shows the id of the created speaker](../../images/42-client-add-speaker.png)
+
+[**<< Session #5 - Adding real-time functionality with subscriptions**](../05-subscriptions/README.md) | [**Session #7 - Testing the GraphQL server >>**](../07-testing-the-graphql-server/README.md)

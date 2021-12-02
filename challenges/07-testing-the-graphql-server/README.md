@@ -140,4 +140,4 @@ A schema change test will simply create a snapshot of your schema and always fai
 
    To execute against a schema we can call `BuildRequestExecutorAsync` on the service collection and get an `IRequestExecutor` to execute queries against our schema. Finally, we snapshot on the result object, and like in the above test, consecutive tests will be validated against our snapshot file.
 
-[**<< Session #5 - Adding real-time functionality with subscriptions**](../05-subscriptions/README.md)
+[**<< Session #6 - GraphQL Clint**](../06-graphql-client/README.md)
