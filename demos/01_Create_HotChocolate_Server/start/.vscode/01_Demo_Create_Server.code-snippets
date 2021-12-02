@@ -1,0 +1,34 @@
+{
+  "01_Books_Entity": {
+    "prefix": "hc_book",
+    "body": ["using System.ComponentModel.DataAnnotations;", "", "namespace Library.GraphQL.Data;", "", "public class Book", "{", "\tpublic int Id { get; set; }", "", "\t[Required]", "\t[StringLength(200)]", "\tpublic string Title { get; set; } = default!;", "", "\t[Required]", "\t[StringLength(13)]", "\tpublic string ISBN { get; set; } = default!;", "", "\t[StringLength(2000)]", "\tpublic string? Description { get; set; }", "}"]
+  },
+  "01_Authors": {
+    "prefix": "hc_author",
+    "body": ["using System.ComponentModel.DataAnnotations;", "", "namespace Library.GraphQL.Data;", "", "public class Author", "{", "\tpublic int Id { get; set; }", "", "\t[Required]", "\t[StringLength(200)]", "\tpublic string Name { get; set; } = default!;", "}"]
+  },
+  "03_DbContext": {
+    "prefix": "hc_dbcontext",
+    "body": ["using Library.GraphQL.Data;", "using Microsoft.EntityFrameworkCore;", "", "namespace Library.GraphQL.Data;", "", "public class ApplicationDbContext : DbContext", "{", "\tpublic ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)", "\t\t: base(options)", "\t{", "\t}", "", "\tpublic DbSet<Book> Books { get; set; } = default!;", "", "\tpublic DbSet<Author> Authors { get; set; } = default!;", "}"]
+  },
+  "04_Query": {
+    "prefix": "hc_query",
+    "body": ["using Library.GraphQL.Data;", "", "namespace Library.GraphQL;", "", "public class Query", "{", "\tpublic IQueryable<Author> GetAuthors([Service] ApplicationDbContext context) =>", "\t\tcontext.Authors;", "", "\tpublic IQueryable<Book> GetBooks([Service] ApplicationDbContext context) =>", "\t\tcontext.Books;", "}"]
+  },
+  "05_Programm": {
+    "prefix": "hc_app",
+    "body": ["using Library.GraphQL.Data;", "using Library.GraphQL;", "using Microsoft.EntityFrameworkCore;", "", "var builder = WebApplication.CreateBuilder(args);", "builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(\"Data Source=library.db\"));", "", "builder.Services", "\t.AddGraphQLServer()", "\t.AddQueryType<Query>();", "", "var app = builder.Build();", "", "app.MapGraphQL();", "", "app.Run();", ""]
+  },
+  "06_AddBookInput": {
+    "prefix": "hc_bookInput",
+    "body": ["namespace Library.GraphQL;", "", "public class AddBookInput", "{", "\tpublic string Title { get; set; } = default!;", "\tpublic string ISBN { get; set; } = default!;", "\tpublic string? Description { get; set; }", "}"]
+  },
+  "07_AddBookPayload": {
+    "prefix": "hc_bookPayload",
+    "body": ["using Library.GraphQL.Data;", "", "namespace Library.GraphQL;", "", "public class AddBookPayload", "{", "\tpublic AddBookPayload(Book book)", "\t{", "\t\tBook = book;", "\t}", "", "\tpublic Book Book { get; }", "}"]
+  },
+  "08_Mutation": {
+    "prefix": "hc_mutation",
+    "body": ["using Library.GraphQL.Data;", "", "namespace Library.GraphQL;", "", "public class Mutation", "{", "\tpublic async Task<AddBookPayload> AddBookAsync(", "\t\tAddBookInput input,", "\t\t[Service] ApplicationDbContext context)", "\t{", "\t\tvar book = new Book", "\t\t{", "\t\t\tTitle = input.Title,", "\t\t\tISBN = input.ISBN,", "\t\t\tDescription = input.Description", "\t\t};", "", "\t\tcontext.Books.Add(book);", "\t\tawait context.SaveChangesAsync();", "", "\t\treturn new AddBookPayload(book);", "\t}", "}"]
+  }
+}
