@@ -124,8 +124,8 @@ type UserError {
 }
 
 input CheckInAttendeeInput {
-  sessionId: Int!
-  attendeeId: Int!
+  sessionId: ID!
+  attendeeId: ID!
 }
 
 input RegisterAttendeeInput {
