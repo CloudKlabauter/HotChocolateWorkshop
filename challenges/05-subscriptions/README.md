@@ -331,7 +331,7 @@ Now that we have the mutation in to register new attendees, let us move on to ad
 1. Start your GraphQL server.
 
    ```console
-   dotnet run --project GraphQL
+   dotnet run --project ConferencePlanner.GraphQL
    ```
 
 1. Validate that you see your new queries and mutations with Banana Cake Pop.
