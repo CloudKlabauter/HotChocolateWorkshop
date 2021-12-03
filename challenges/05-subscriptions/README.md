@@ -340,57 +340,45 @@ Now that we have the mutation in to register new attendees, let us move on to ad
 
 With the base in, we now can focus on putting subscriptions on our GraphQL server. GraphQL subscriptions by default work over WebSockets but could also work over SignalR or gRPC. We will first update our request pipeline to use WebSockets, and then we will set up the subscription pub/sub-system. After having our server prepared, we will put in the subscriptions to our API.
 
-1. Head over to `Startup.cs` and add `app.WebSockets` to the request pipeline. Middleware order is also important with ASP.NET Core, so this middleware needs to come before the GraphQL middleware.
+1. Head over to `Program.cs` and add `app.WebSockets` to the request pipeline. Middleware order is also important with ASP.NET Core, so this middleware needs to come before the GraphQL middleware.
 
    ```csharp
-   public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-   {
-       if (env.IsDevelopment())
-       {
-           app.UseDeveloperExceptionPage();
-       }
+    // ...
+   
+    var app = builder.Build();
 
-       app.UseWebSockets();
-       app.UseRouting();
+    app.UseWebSockets();
+    app.UseRouting();
+    app.MapGraphQL();
 
-       app.UseEndpoints(endpoints =>
-       {
-           endpoints.MapGraphQL();
-       });
-   }
+    app.Run();
    ```
 
-1. Stay in the `Startup.cs` and add `.AddInMemorySubscriptions();` to the `ConfigureServices` method.
+1. Stay in the `Program.cs` and add `.AddInMemorySubscriptions();` to the `Services` method.
 
    ```csharp
-   public void ConfigureServices(IServiceCollection services)
-   {
-       services.AddPooledDbContextFactory<ApplicationDbContext>(
-           options => options.UseSqlite("Data Source=conferences.db"));
-
-       services
-           .AddGraphQLServer()
-           .AddQueryType(d => d.Name("Query"))
-               .AddTypeExtension<AttendeeQueries>()
-               .AddTypeExtension<SpeakerQueries>()
-               .AddTypeExtension<SessionQueries>()
-               .AddTypeExtension<TrackQueries>()
-           .AddMutationType(d => d.Name("Mutation"))
-               .AddTypeExtension<AttendeeMutations>()
-               .AddTypeExtension<SessionMutations>()
-               .AddTypeExtension<SpeakerMutations>()
-               .AddTypeExtension<TrackMutations>()
-           .AddType<AttendeeType>()
-           .AddType<SessionType>()
-           .AddType<SpeakerType>()
-           .AddType<TrackType>()
-           .EnableRelaySupport()
-           .AddFiltering()
-           .AddSorting()
-           .AddInMemorySubscriptions()
-           .AddDataLoader<SpeakerByIdDataLoader>()
-           .AddDataLoader<SessionByIdDataLoader>();
-   }
+   builder.Services
+    .AddGraphQLServer()
+    .AddQueryType(d => d.Name("Query"))
+        .AddTypeExtension<AttendeeQueries>()
+        .AddTypeExtension<SpeakerQueries>()
+        .AddTypeExtension<SessionQueries>()
+        .AddTypeExtension<TrackQueries>()
+    .AddMutationType(d => d.Name("Mutation"))
+        .AddTypeExtension<AttendeeMutations>()
+        .AddTypeExtension<SessionMutations>()
+        .AddTypeExtension<SpeakerMutations>()
+        .AddTypeExtension<TrackMutations>()
+    .AddType<AttendeeType>()
+    .AddType<SessionType>()
+    .AddType<SpeakerType>()
+    .AddType<TrackType>()
+    .AddGlobalObjectIdentification()
+    .AddFiltering()
+    .AddSorting()
+    .AddInMemorySubscriptions()
+    .AddDataLoader<SpeakerByIdDataLoader>()
+    .AddDataLoader<SessionByIdDataLoader>();
    ```
 
    > With `app.UseWebSockets()` we have enabled our server to handle websocket request. With `.AddInMemorySubscriptions();` we have added an in-memory pub/sub system for GraphQL subscriptions to our schema.
@@ -422,33 +410,33 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
 
    > The `[EventMessage]` attribute marks the parameter where the execution engine shall inject the message payload of the pub/sub-system.
 
-1. Head back to the `Startup.cs` and register the `SessionSubscriptions` with the schema builder.
+1. Head back to the `Program.cs` and register the `SessionSubscriptions` with the schema builder.
 
    ```csharp
-   services
-       .AddGraphQLServer()
-       .AddQueryType(d => d.Name("Query"))
-           .AddTypeExtension<AttendeeQueries>()
-           .AddTypeExtension<SpeakerQueries>()
-           .AddTypeExtension<SessionQueries>()
-           .AddTypeExtension<TrackQueries>()
-       .AddMutationType(d => d.Name("Mutation"))
-           .AddTypeExtension<AttendeeMutations>()
-           .AddTypeExtension<SessionMutations>()
-           .AddTypeExtension<SpeakerMutations>()
-           .AddTypeExtension<TrackMutations>()
-       .AddSubscriptionType(d => d.Name("Subscription"))
-           .AddTypeExtension<SessionSubscriptions>()
-       .AddType<AttendeeType>()
-       .AddType<SessionType>()
-       .AddType<SpeakerType>()
-       .AddType<TrackType>()
-       .EnableRelaySupport()
-       .AddFiltering()
-       .AddSorting()
-       .AddInMemorySubscriptions()
-       .AddDataLoader<SpeakerByIdDataLoader>()
-       .AddDataLoader<SessionByIdDataLoader>();
+    builder.Services
+        .AddGraphQLServer()
+        .AddQueryType(d => d.Name("Query"))
+            .AddTypeExtension<AttendeeQueries>()
+            .AddTypeExtension<SpeakerQueries>()
+            .AddTypeExtension<SessionQueries>()
+            .AddTypeExtension<TrackQueries>()
+        .AddMutationType(d => d.Name("Mutation"))
+            .AddTypeExtension<AttendeeMutations>()
+            .AddTypeExtension<SessionMutations>()
+            .AddTypeExtension<SpeakerMutations>()
+            .AddTypeExtension<TrackMutations>()
+        .AddSubscriptionType(d => d.Name("Subscription"))
+            .AddTypeExtension<SessionSubscriptions>()
+        .AddType<AttendeeType>()
+        .AddType<SessionType>()
+        .AddType<SpeakerType>()
+        .AddType<TrackType>()
+        .AddGlobalObjectIdentification()
+        .AddFiltering()
+        .AddSorting()
+        .AddInMemorySubscriptions()
+        .AddDataLoader<SpeakerByIdDataLoader>()
+        .AddDataLoader<SessionByIdDataLoader>();
    ```
 
    The subscription type itself is now registered, but we still need something to trigger the event. So, next, we are going to update our `scheduleSession` resolver to trigger an event.
@@ -506,7 +494,7 @@ With the base in, we now can focus on putting subscriptions on our GraphQL serve
 1. Start your GraphQL server.
 
    ```console
-   dotnet run --project GraphQL
+   dotnet run --project ConferencePlanner.GraphQL
    ```
 
 1. Open Banana Cake Pop and refresh the schema.
@@ -699,34 +687,34 @@ The `onSessionScheduled` was quite simple since we did not subscribe to a dynami
 
    The subscribe resolver is using `ITopicEventReceiver` to subscribe to a topic. A subscribe resolver can return `IAsyncEnumerable<T>`, `IEnumerable<T>` or `IObservable<T>` to represent the subscription stream. The subscribe resolver has access to all the arguments that the actual resolver has access to.
 
-   1. Head back to the `Startup.cs` and register this new subscription type with the schema builder.
+   1. Head back to the `Program.cs` and register this new subscription type with the schema builder.
 
    ```csharp
-   services
-       .AddGraphQLServer()
-       .AddQueryType(d => d.Name("Query"))
-           .AddTypeExtension<AttendeeQueries>()
-           .AddTypeExtension<SpeakerQueries>()
-           .AddTypeExtension<SessionQueries>()
-           .AddTypeExtension<TrackQueries>()
-       .AddMutationType(d => d.Name("Mutation"))
-           .AddTypeExtension<AttendeeMutations>()
-           .AddTypeExtension<SessionMutations>()
-           .AddTypeExtension<SpeakerMutations>()
-           .AddTypeExtension<TrackMutations>()
-       .AddSubscriptionType(d => d.Name("Subscription"))
-           .AddTypeExtension<AttendeeSubscriptions>()
-           .AddTypeExtension<SessionSubscriptions>()
-       .AddType<AttendeeType>()
-       .AddType<SessionType>()
-       .AddType<SpeakerType>()
-       .AddType<TrackType>()
-       .EnableRelaySupport()
-       .AddFiltering()
-       .AddSorting()
-       .AddInMemorySubscriptions()
-       .AddDataLoader<SpeakerByIdDataLoader>()
-       .AddDataLoader<SessionByIdDataLoader>();
+   builder.Services
+    .AddGraphQLServer()
+    .AddQueryType(d => d.Name("Query"))
+        .AddTypeExtension<AttendeeQueries>()
+        .AddTypeExtension<SpeakerQueries>()
+        .AddTypeExtension<SessionQueries>()
+        .AddTypeExtension<TrackQueries>()
+    .AddMutationType(d => d.Name("Mutation"))
+        .AddTypeExtension<AttendeeMutations>()
+        .AddTypeExtension<SessionMutations>()
+        .AddTypeExtension<SpeakerMutations>()
+        .AddTypeExtension<TrackMutations>()
+    .AddSubscriptionType(d => d.Name("Subscription"))
+        .AddTypeExtension<SessionSubscriptions>()
+        .AddTypeExtension<AttendeeSubscriptions>()
+    .AddType<AttendeeType>()
+    .AddType<SessionType>()
+    .AddType<SpeakerType>()
+    .AddType<TrackType>()
+    .AddGlobalObjectIdentification()
+    .AddFiltering()
+    .AddSorting()
+    .AddInMemorySubscriptions()
+    .AddDataLoader<SpeakerByIdDataLoader>()
+    .AddDataLoader<SessionByIdDataLoader>();
    ```
 
    1. Start your GraphQL server again.
